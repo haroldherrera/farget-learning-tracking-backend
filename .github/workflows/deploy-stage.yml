@@ -3,7 +3,7 @@ name: Main orchestration of the Githubactions
 on:
   push:
     branches:
-      - stage_
+      - stage
 
 permissions:
   id-token: write
