@@ -96,71 +96,71 @@ Resources:
         Environment:
           Ref: Environment
 
-  # LoadBalacingStack:
-  #   DependsOn:
-  #     - CertificateStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ./loadbalancing/loadbalancing_v2.yaml
+  LoadBalacingStack:
+    DependsOn:
+      - CertificateStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./loadbalancing/loadbalancing_v2.yaml
 
-  #     Parameters:
-  #       Environment:
-  #         Ref: Environment
-  #       VPC:
-  #         Fn::GetAtt: VPCStack.Outputs.VPCId
-  #       PublicSubnetA:
-  #         Fn::GetAtt: VPCStack.Outputs.PublicSubnetA
-  #       PublicSubnetB:
-  #         Fn::GetAtt: VPCStack.Outputs.PublicSubnetB
-  #       LoadBalancerSecurityGroup:
-  #         Fn::GetAtt: SecurityStack.Outputs.LoadBalancerSecurityGroup
-  #       DomainName:
-  #         Ref: DomainName
-  #       HostedZoneId:
-  #         Ref: HostedZoneId
-  #       CertificateArn:
-  #         Fn::GetAtt: CertificateStack.Outputs.CertificateArn
+      Parameters:
+        Environment:
+          Ref: Environment
+        VPC:
+          Fn::GetAtt: VPCStack.Outputs.VPCId
+        PublicSubnetA:
+          Fn::GetAtt: VPCStack.Outputs.PublicSubnetA
+        PublicSubnetB:
+          Fn::GetAtt: VPCStack.Outputs.PublicSubnetB
+        LoadBalancerSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.LoadBalancerSecurityGroup
+        DomainName:
+          Ref: DomainName
+        HostedZoneId:
+          Ref: HostedZoneId
+        CertificateArn:
+          Fn::GetAtt: CertificateStack.Outputs.CertificateArn
 
-  # ECSContainerStack:
-  #   DependsOn:
-  #     - IAMStack
-  #     - LoadBalacingStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ./ecs_container.yaml
-  #     Parameters:
-  #       Environment:
-  #         Ref: Environment
-  #       EC2InstanceProfile:
-  #         Fn::GetAtt: IAMStack.Outputs.EC2InstanceProfile
-  #       TargetGroupArn:
-  #         Fn::GetAtt: LoadBalacingStack.Outputs.TargetGroupArn
-  #       ECSAMI:
-  #         Ref: ECSAMI
-  #       PrivateSubnetA:
-  #         Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
-  #       PrivateSubnetB:
-  #         Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
-  #       InstancesSecurityGroup:
-  #         Fn::GetAtt: SecurityStack.Outputs.InstancesSecurityGroup
-  #       ECSTaskExecutionRole:
-  #         Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
-  #       ECRImage:
-  #         Ref: ECRImage
+  ECSContainerStack:
+    DependsOn:
+      - IAMStack
+      - LoadBalacingStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./ecs_container.yaml
+      Parameters:
+        Environment:
+          Ref: Environment
+        EC2InstanceProfile:
+          Fn::GetAtt: IAMStack.Outputs.EC2InstanceProfile
+        TargetGroupArn:
+          Fn::GetAtt: LoadBalacingStack.Outputs.TargetGroupArn
+        ECSAMI:
+          Ref: ECSAMI
+        PrivateSubnetA:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+        PrivateSubnetB:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        InstancesSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.InstancesSecurityGroup
+        ECSTaskExecutionRole:
+          Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
+        ECRImage:
+          Ref: ECRImage
 
-  # Route53Stack:
-  #   DependsOn: LoadBalacingStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ./route_53.yaml
-  #     Parameters:
-  #       DomainName:
-  #         Ref: DomainName
-  #       HostedZoneId:
-  #         Ref: HostedZoneId
-  #       LoadBalancerCanonicalHostedZoneID:
-  #         Fn::GetAtt: LoadBalacingStack.Outputs.LoadBalancerCanonicalHostedZoneID
-  #       LoadBalancerDNSName:
-  #         Fn::GetAtt: LoadBalacingStack.Outputs.LoadBalancerDNSName
-  #       Environment:
-  #         Ref: Environment
+  Route53Stack:
+    DependsOn: LoadBalacingStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./route_53.yaml
+      Parameters:
+        DomainName:
+          Ref: DomainName
+        HostedZoneId:
+          Ref: HostedZoneId
+        LoadBalancerCanonicalHostedZoneID:
+          Fn::GetAtt: LoadBalacingStack.Outputs.LoadBalancerCanonicalHostedZoneID
+        LoadBalancerDNSName:
+          Fn::GetAtt: LoadBalacingStack.Outputs.LoadBalancerDNSName
+        Environment:
+          Ref: Environment
