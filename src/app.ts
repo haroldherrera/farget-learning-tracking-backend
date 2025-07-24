@@ -31,9 +31,7 @@ app.get('/', (req, res) => {
     if (isPrime(i)) count++;
   }
 
-  res.send(
-    `There are ${count} prime numbers between 1 - ${limit}!!!***************************`
-  );
+  res.send(`There are ${count} prime numbers between 1 - ${limit}`);
 });
 
 // app.get('/', cors(corsOptions), (req, res) => {
