@@ -121,32 +121,32 @@ Resources:
         CertificateArn:
           Fn::GetAtt: CertificateStack.Outputs.CertificateArn
 
-  ECSContainerStack:
-    DependsOn:
-      - IAMStack
-      - LoadBalacingStack
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./ecs_container.yaml
-      Parameters:
-        Environment:
-          Ref: Environment
-        EC2InstanceProfile:
-          Fn::GetAtt: IAMStack.Outputs.EC2InstanceProfile
-        TargetGroupArn:
-          Fn::GetAtt: LoadBalacingStack.Outputs.TargetGroupArn
-        ECSAMI:
-          Ref: ECSAMI
-        PrivateSubnetA:
-          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
-        PrivateSubnetB:
-          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
-        InstancesSecurityGroup:
-          Fn::GetAtt: SecurityStack.Outputs.InstancesSecurityGroup
-        ECSTaskExecutionRole:
-          Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
-        ECRImage:
-          Ref: ECRImage
+  # ECSContainerStack:
+  #   DependsOn:
+  #     - IAMStack
+  #     - LoadBalacingStack
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ./ecs_container.yaml
+  #     Parameters:
+  #       Environment:
+  #         Ref: Environment
+  #       EC2InstanceProfile:
+  #         Fn::GetAtt: IAMStack.Outputs.EC2InstanceProfile
+  #       TargetGroupArn:
+  #         Fn::GetAtt: LoadBalacingStack.Outputs.TargetGroupArn
+  #       ECSAMI:
+  #         Ref: ECSAMI
+  #       PrivateSubnetA:
+  #         Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+  #       PrivateSubnetB:
+  #         Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+  #       InstancesSecurityGroup:
+  #         Fn::GetAtt: SecurityStack.Outputs.InstancesSecurityGroup
+  #       ECSTaskExecutionRole:
+  #         Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
+  #       ECRImage:
+  #         Ref: ECRImage
 
   Route53Stack:
     DependsOn: LoadBalacingStack
