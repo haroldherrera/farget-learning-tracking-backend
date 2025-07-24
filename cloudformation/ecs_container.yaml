@@ -109,7 +109,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
         DeploymentCircuitBreaker:
-          Enabled: true
+          Enable: true
           Rollback: true
       DesiredCount: 2
       HealthCheckGracePeriodSeconds: 300
