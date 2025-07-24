@@ -57,7 +57,7 @@ Resources:
       Family:
         Fn::Sub: learning-tracking-${Environment}
       Cpu: 512
-      Memory: 512
+      Memory: 1024
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
@@ -67,7 +67,7 @@ Resources:
         - Name:
             Fn::Sub: learning-tracking-${Environment}
           Cpu: 512
-          Memory: 512
+          Memory: 1024
           Image:
             Ref: ECRImage
           PortMappings:
