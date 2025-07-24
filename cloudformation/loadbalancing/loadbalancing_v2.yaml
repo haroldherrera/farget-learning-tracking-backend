@@ -58,7 +58,7 @@ Resources:
         HttpCode: '200-299'
       Name:
         Fn::Sub: ECSTargetGroup-${Environment}
-      TargetType: instance
+      TargetType: ip
       Port: 3000
       Protocol: HTTP
       ProtocolVersion: HTTP1
