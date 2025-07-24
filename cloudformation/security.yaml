@@ -86,10 +86,15 @@ Resources:
 Outputs:
   VpcEndpointSecurityGroup:
     Value:
-      Ref: VpcEndpointSecurityGroup
+      Fn::If:
+        - IsStaging
+        - Ref: VpcEndpointSecurityGroup
+        - ''
+
   LoadBalancerSecurityGroup:
     Value:
       Ref: LoadBalancerSecurityGroup
+
   InstancesSecurityGroup:
     Value:
       Ref: InstancesSecurityGroup
