@@ -94,43 +94,43 @@ Resources:
             Retries: 3
             StartPeriod: 60
 
-  # Service:
-  #   Type: AWS::ECS::Service
-  #   Properties:
-  #     ServiceName:
-  #       Fn::Sub: learning-tracking-${Environment}
-  #     Cluster:
-  #       Ref: ECSCluster
-  #     CapacityProviderStrategy:
-  #       - base: 1
-  #         CapacityProvider: FARGATE
-  #         Weight: 1
-  #     DeploymentConfiguration:
-  #       MaximumPercent: 200
-  #       MinimumHealthyPercent: 100
-  #       DeploymentCircuitBreaker:
-  #         Enabled: true
-  #         Rollback: true
-  #     DesiredCount: 2
-  #     HealthCheckGracePeriodSeconds: 300
-  #     LoadBalancers:
-  #       - ContainerName:
-  #           Fn::Sub: learning-tracking-${Environment}
-  #         ContainerPort: 3000
-  #         TargetGroupArn:
-  #           Ref: TargetGroupArn
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName:
+        Fn::Sub: learning-tracking-${Environment}
+      Cluster:
+        Ref: ECSCluster
+      CapacityProviderStrategy:
+        - base: 1
+          CapacityProvider: FARGATE
+          Weight: 1
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enabled: true
+          Rollback: true
+      DesiredCount: 2
+      HealthCheckGracePeriodSeconds: 300
+      LoadBalancers:
+        - ContainerName:
+            Fn::Sub: learning-tracking-${Environment}
+          ContainerPort: 3000
+          TargetGroupArn:
+            Ref: TargetGroupArn
 
-  #     NetworkConfiguration:
-  #       AwsvpcConfiguration:
-  #         AssignPublicIp: 'ENABLED'
-  #         SecurityGroups:
-  #           - Ref: InstancesSecurityGroup
-  #         Subnets:
-  #           - Ref: PrivateSubnetA
-  #           - Ref: PrivateSubnetB
-  #     PlatformVersion: LATEST
-  #     TaskDefinition:
-  #       Ref: TaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: 'ENABLED'
+          SecurityGroups:
+            - Ref: InstancesSecurityGroup
+          Subnets:
+            - Ref: PrivateSubnetA
+            - Ref: PrivateSubnetB
+      PlatformVersion: LATEST
+      TaskDefinition:
+        Ref: TaskDefinition
 
   # ServiceScalableTarget:
   #   Type: AWS::ApplicationAutoScaling::ScalableTarget
