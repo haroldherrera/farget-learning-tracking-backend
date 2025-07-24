@@ -1,0 +1,166 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Main template orchestrating the other sub templates
+
+Parameters:
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+  VpcCidrBlock:
+    Description: CidrBlock for the VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  DomainName:
+    Type: String
+
+  HostedZoneId:
+    Type: String
+
+  ECSAMI:
+    Description: The Amazon Machine Image ID used for the cluster
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id
+
+  ECRImage:
+    Description: The ECR image of the docker container to be deployed
+    Type: String
+
+Conditions:
+  IsStaging:
+    Fn::Equals:
+      - Ref: Environment
+      - stage
+Resources:
+  CertificateStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./certificate.yaml
+      Parameters:
+        DomainName:
+          Ref: DomainName
+        HostedZoneId:
+          Ref: HostedZoneId
+        Environment:
+          Ref: Environment
+
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./networking/networking.yaml
+      Parameters:
+        VpcCidrBlock:
+          Ref: VpcCidrBlock
+        Environment:
+          Ref: Environment
+
+  SecurityStack:
+    DependsOn: VPCStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./security.yaml
+      Parameters:
+        VPC:
+          Fn::GetAtt: VPCStack.Outputs.VPCId
+        Environment:
+          Ref: Environment
+
+  IAMStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./iam.yaml
+
+  VpcEndpointsStack:
+    Condition: IsStaging
+    DependsOn:
+      - SecurityStack
+      - VPCStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./vpc_endpoints.yaml
+      Parameters:
+        VPC:
+          Fn::GetAtt: VPCStack.Outputs.VPCId
+        PrivateSubnetA:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+        PrivateSubnetB:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        VpcEndpointSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.VpcEndpointSecurityGroup
+        PrivateRouteTable:
+          Fn::GetAtt: VPCStack.Outputs.PrivateRouteTable
+        Environment:
+          Ref: Environment
+
+  LoadBalacingStack:
+    DependsOn:
+      - CertificateStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./loadbalancing/loadbalancing_v2.yaml
+
+      Parameters:
+        Environment:
+          Ref: Environment
+        VPC:
+          Fn::GetAtt: VPCStack.Outputs.VPCId
+        PublicSubnetA:
+          Fn::GetAtt: VPCStack.Outputs.PublicSubnetA
+        PublicSubnetB:
+          Fn::GetAtt: VPCStack.Outputs.PublicSubnetB
+        LoadBalancerSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.LoadBalancerSecurityGroup
+        DomainName:
+          Ref: DomainName
+        HostedZoneId:
+          Ref: HostedZoneId
+        CertificateArn:
+          Fn::GetAtt: CertificateStack.Outputs.CertificateArn
+
+  ECSContainerStack:
+    DependsOn:
+      - IAMStack
+      - LoadBalacingStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./ecs_container.yaml
+      Parameters:
+        Environment:
+          Ref: Environment
+        EC2InstanceProfile:
+          Fn::GetAtt: IAMStack.Outputs.EC2InstanceProfile
+        TargetGroupArn:
+          Fn::GetAtt: LoadBalacingStack.Outputs.TargetGroupArn
+        ECSAMI:
+          Ref: ECSAMI
+        PrivateSubnetA:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+        PrivateSubnetB:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        InstancesSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.InstancesSecurityGroup
+        ECSTaskExecutionRole:
+          Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
+        ECRImage:
+          Ref: ECRImage
+
+  Route53Stack:
+    DependsOn: LoadBalacingStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./route_53.yaml
+      Parameters:
+        DomainName:
+          Ref: DomainName
+        HostedZoneId:
+          Ref: HostedZoneId
+        LoadBalancerCanonicalHostedZoneID:
+          Fn::GetAtt: LoadBalacingStack.Outputs.LoadBalancerCanonicalHostedZoneID
+        LoadBalancerDNSName:
+          Fn::GetAtt: LoadBalacingStack.Outputs.LoadBalancerDNSName
+        Environment:
+          Ref: Environment

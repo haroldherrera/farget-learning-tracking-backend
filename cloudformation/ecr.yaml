@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ECR Repository for the Nodejs app container
+
+Parameters:
+  ECRRepoName:
+    Description: The name of the ECR Repository
+    Type: String
+
+Resources:
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName:
+        Ref: ECRRepoName
+
+Outputs:
+  ECRRepository:
+    Description: The repository name
+    Value:
+      Fn::GetAtt:
+        - ECRRepository
+        - RepositoryUri

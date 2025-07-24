@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates the listener for HTTP for development
+
+Parameters:
+  TargetGroupArn:
+    Type: String
+  LoadBalancerArn:
+    Type: String
+
+Resources:
+  LoadBalancerListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn:
+                  Ref: TargetGroupArn
+                Weight: 1
+            StatusCode: 200
+      LoadBalancerArn:
+        Ref: LoadBalancerArn
+      Port: 80
+      Protocol: HTTP

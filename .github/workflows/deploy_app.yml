@@ -1,0 +1,81 @@
+name: Deploy ECR
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+    secrets:
+      AWS_Role:
+        required: true
+      AWS_ACCOUNT_ID:
+        required: true
+      HOSTED_ZONE_ID:
+        required: true
+
+jobs:
+  CreateRepoECR:
+    environment:
+      name: ${{ inputs.environment }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{secrets.AWS_ROLE }}
+
+      - name: AWS CloudFormation Deploy CloudFormation Stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.2.0
+        with:
+          name: ecr-repo-stack-${{inputs.environment}}
+          template: ./cloudformation/ecr.yaml
+          parameter-overrides: ECRRepoName=learning-tracking-${{inputs.environment}}
+          no-fail-on-empty-changeset: 1
+
+      - name: Amazon ECR "Login" Action for GitHub Actions
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: ${{secrets.AWS_ACCOUNT_ID}}
+
+      - name: Obtain the ECR Stack name
+        id: ECRImageName
+        run: |
+          IMAGE_NAME=$(aws cloudformation describe-stacks --stack-name ecr-repo-stack-${{inputs.environment}} --query "Stacks[0].Outputs[0].OutputValue" --output text)
+          echo "ImageName=${IMAGE_NAME}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push the docker image
+        uses: docker/build-push-action@v6.18.0
+        with:
+          push: true
+          tags: ${{ steps.ECRImageName.outputs.ImageName }}
+
+      - name: Package CloudFormation template
+        run: |
+          aws cloudformation package \
+            --template-file ./cloudformation/main.yaml \
+            --s3-bucket s3-learning-tracking-app \
+            --output-template-file ./packaged-template.yaml
+      - name: AWS CloudFormation Deploy CloudFormation Stack For the entire Infrastructure
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.2.0
+        with:
+          name: ecs-infra-stack-${{inputs.environment}}
+          template: ./packaged-template.yaml
+          parameter-overrides: >-
+            Environment=${{inputs.environment}},
+            VpcCidrBlock=${{vars.VPC_CIDR_BLOCK}},
+            HostedZoneId=${{ secrets.HOSTED_ZONE_ID }},
+            DomainName=${{ vars.DOMAIN_NAME }},
+            ECRImage=${{ steps.ECRImageName.outputs.ImageName }}
+
+          no-fail-on-empty-changeset: 1

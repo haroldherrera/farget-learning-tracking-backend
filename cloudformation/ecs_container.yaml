@@ -1,0 +1,235 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates the infrastructure for the ECS Container to be deployed
+
+Parameters:
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+  ECSAMI:
+    Type: String
+
+  EC2InstanceProfile:
+    Type: String
+
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet::Id
+
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet::Id
+
+  InstancesSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+
+  TargetGroupArn:
+    Type: String
+
+  ECSTaskExecutionRole:
+    Type: String
+
+  ECRImage:
+    Description: The ECR image of the docker container to be deployed
+    Type: String
+
+Conditions:
+  IsDevelopment:
+    Fn::Equals:
+      - Ref: Environment
+      - development
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName:
+        Fn::Sub: ${Environment}-Cluster
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  LaunchTemplateEC2:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName:
+        Fn::Sub: Learning-Tracking-${Environment}
+      LaunchTemplateData:
+        ImageId:
+          Ref: ECSAMI
+        InstanceType: t2.micro
+        IamInstanceProfile:
+          Name:
+            Ref: EC2InstanceProfile
+        NetworkInterfaces:
+          Fn::If:
+            - IsDevelopment
+            - - DeviceIndex: 0
+                Groups:
+                  - Ref: InstancesSecurityGroup
+                AssociatePublicIpAddress: true
+                DeleteOnTermination: true
+            - - DeviceIndex: 0
+                Groups:
+                  - Ref: InstancesSecurityGroup
+                DeleteOnTermination: true
+
+        MetadataOptions:
+          HttpEndpoint: enabled
+          HttpTokens: required
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            echo "ECS_CLUSTER=${ECSCluster}" >> /etc/ecs/ecs.config
+
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - Ref: PrivateSubnetA
+        - Ref: PrivateSubnetB
+      LaunchTemplate:
+        LaunchTemplateId:
+          Ref: LaunchTemplateEC2
+        Version:
+          Fn::GetAtt: LaunchTemplateEC2.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 15
+      DesiredCapacity: 1
+      TargetGroupARNs:
+        - Ref: TargetGroupArn
+      NewInstancesProtectedFromScaleIn: true
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-ECSAutoScalingGroup
+          PropagateAtLaunch: true
+
+  CapacityProvider:
+    Type: AWS::ECS::CapacityProvider
+    Properties:
+      Name:
+        Fn::Sub: learning-tracking-capacity-provider-${Environment}
+      AutoScalingGroupProvider:
+        AutoScalingGroupArn:
+          Ref: ECSAutoScalingGroup
+        ManagedScaling:
+          InstanceWarmupPeriod: 60
+          MinimumScalingStepSize: 1
+          MaximumScalingStepSize: 1
+          Status: ENABLED
+          TargetCapacity: 100
+        ManagedTerminationProtection: ENABLED
+
+  CapacityProviderAssociation:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties:
+      CapacityProviders:
+        - Ref: CapacityProvider
+      Cluster:
+        Ref: ECSCluster
+      DefaultCapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider:
+            Ref: CapacityProvider
+          Weight: 1
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family:
+        Fn::Sub: learning-tracking-${Environment}
+      Cpu: 512
+      Memory: 512
+      NetworkMode: bridge
+      RequiresCompatibilities:
+        - EC2
+      ExecutionRoleArn:
+        Ref: ECSTaskExecutionRole
+      ContainerDefinitions:
+        - Name:
+            Fn::Sub: learning-tracking-${Environment}
+          Cpu: 512
+          Memory: 512
+          Image:
+            Ref: ECRImage
+          PortMappings:
+            - ContainerPort: 3000
+              HostPort: 0
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              mode: non-blocking
+              max-buffer-size: 25m
+              awslogs-group:
+                Fn::Sub: /ecs/Nodejs-app-${Environment}
+              awslogs-region:
+                Ref: AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - curl -f http://localhost:3000/ || exit 1
+            Interval: 30
+            Timeout: 5
+            Retries: 3
+            StartPeriod: 60
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName:
+        Fn::Sub: learning-tracking-${Environment}
+      Cluster:
+        Ref: ECSCluster
+      PlacementStrategies:
+        - Field: cpu
+          Type: binpack
+      CapacityProviderStrategy:
+        - CapacityProvider:
+            Ref: CapacityProvider
+          Weight: 1
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 2
+      HealthCheckGracePeriodSeconds: 300
+      TaskDefinition:
+        Ref: TaskDefinition
+      LoadBalancers:
+        - ContainerName:
+            Fn::Sub: learning-tracking-${Environment}
+          ContainerPort: 3000
+          TargetGroupArn:
+            Ref: TargetGroupArn
+
+  ServiceScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 15
+      MinCapacity: 1
+      ResourceId:
+        Fn::Sub: service/${ECSCluster}/${Service.Name}
+      RoleARN:
+        Fn::Sub: arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  ServiceScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: ECSContainerServiceScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId:
+        Ref: ServiceScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 50
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 60
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization

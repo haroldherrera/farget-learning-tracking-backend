@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates the bucket that will be used for packaging the nested stacks
+
+Parameters:
+  BucketName:
+    Description: This bucket is needed for the corresponding packaging
+    Type: String
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      LifecycleConfiguration:
+        Rules:
+          - ExpirationInDays: 2
+            Status: Enabled
+      Tags:
+        - Key: Name
+          Value: Learning-Tracking-Package
+
+Outputs:
+  BucketName:
+    Value:
+      Ref: S3Bucket
+    Description: Name of the bucket needed for package the master stack

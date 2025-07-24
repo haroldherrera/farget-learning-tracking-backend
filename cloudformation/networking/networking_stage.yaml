@@ -1,0 +1,217 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create VPC, Subnets, InternetGateway, RouteTables
+
+Parameters:
+  VpcCidrBlock:
+    Description: CidrBlock for the VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Ref: VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: LearningTrackingVPC-${Environment}
+
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::Select:
+          - 0
+          - Fn::Cidr:
+              - Ref: VpcCidrBlock
+              - 4
+              - 8
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: PrivateSubnetA-${Environment}
+
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::Select:
+          - 1
+          - Fn::Cidr:
+              - Ref: VpcCidrBlock
+              - 4
+              - 8
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: PrivateSubnetB-${Environment}
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::Select:
+          - 2
+          - Fn::Cidr:
+              - Ref: VpcCidrBlock
+              - 4
+              - 8
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: PublicSubnetA-${Environment}
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::Select:
+          - 3
+          - Fn::Cidr:
+              - Ref: VpcCidrBlock
+              - 4
+              - 8
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: PublicSubnetB-${Environment}
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Learning-tracking-IG-${Environment}
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: InternetGateway
+
+  PublicRouteTable:
+    DependsOn: AttachGateway
+
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Learning-tracking-PublicRouteTable-${Environment}
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+
+  PublicSubnetAAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnetA
+      RouteTableId:
+        Ref: PublicRouteTable
+
+  PublicSubnetBAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnetB
+      RouteTableId:
+        Ref: PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Learning-tracking-PrivateRouteTable-${Environment}
+
+  PrivateSubnetAAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnetA
+      RouteTableId:
+        Ref: PrivateRouteTable
+
+  PrivateSubnetBAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnetB
+      RouteTableId:
+        Ref: PrivateRouteTable
+
+Outputs:
+  VPCId:
+    Description: Vpc Created
+    Value:
+      Ref: VPC
+  PrivateSubnetA:
+    Value:
+      Ref: PrivateSubnetA
+  PrivateSubnetB:
+    Value:
+      Ref: PrivateSubnetB
+  PublicSubnetA:
+    Value:
+      Ref: PublicSubnetA
+  PublicSubnetB:
+    Value:
+      Ref: PublicSubnetB
+  PrivateRouteTable:
+    Value:
+      Ref: PrivateRouteTable

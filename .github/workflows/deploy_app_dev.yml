@@ -1,0 +1,148 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: ['dev111']
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ROLE_TO_ASSUME: ${{secrets.AWS_ROLE }}
+  AWS_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
+  DOMAIN_NAME: ${{vars.DOMAIN_NAME}}
+  HOSTED_ZONE_ID: ${{ vars.HOSTED_ZONE_ID }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  Test:
+    environment: development
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Cache Dependencies
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.npm
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run the linters
+        run: npm run lint
+
+  Build:
+    needs: Test
+    environment: development
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Cache Dependencies
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.npm
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build the code
+        run: npm run build
+
+  CreateRepoECR:
+    needs: Build
+    environment: development
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-region: ${{env.AWS_REGION}}
+          role-to-assume: ${{env.AWS_ROLE_TO_ASSUME}}
+
+      - name: AWS CloudFormation Deploy CloudFormation Stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.2.0
+        with:
+          name: ecr-repo-stack
+          template: ./cloudformation/ecr.yaml
+          parameter-overrides: ECRRepoName=nodejs-app
+          no-fail-on-empty-changeset: 1
+
+  BuildPushDockerImage:
+    needs: CreateRepoECR
+    environment: development
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-region: ${{env.AWS_REGION}}
+          role-to-assume: ${{env.AWS_ROLE_TO_ASSUME}}
+
+      - name: Amazon ECR "Login" Action for GitHub Actions
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: ${{env.AWS_ACCOUNT_ID}}
+
+      - name: Obtain the ECR Stack name
+        id: ECRImageName
+        run: |
+          IMAGE_NAME=$(aws cloudformation describe-stacks --stack-name ecr-repo-stack --query "Stacks[0].Outputs[0].OutputValue" --output text)
+          echo "ImageName=${IMAGE_NAME}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push the docker image
+        uses: docker/build-push-action@v6.18.0
+        with:
+          push: true
+          tags: ${{ steps.ECRImageName.outputs.ImageName }}
+
+      - name: AWS CloudFormation Deploy CloudFormation Stack For the entire Infrastructure
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.2.0
+        with:
+          name: ecs-infra-stack
+          template: ./cloudformation/main.yaml
+          parameter-overrides: >-
+            VpcCidrBlock=10.0.0.0/16,
+            ECRImage=${{ steps.ECRImageName.outputs.ImageName }},
+            DomainName=${{env.DOMAIN_NAME}},
+            HostedZoneId=${{env.HOSTED_ZONE_ID}}
+          no-fail-on-empty-changeset: 1

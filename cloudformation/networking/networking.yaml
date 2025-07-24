@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create VPC, Subnets, InternetGateway, RouteTables
+
+Parameters:
+  VpcCidrBlock:
+    Description: CidrBlock for the VPC
+    Type: String
+
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+Conditions:
+  IsStaging:
+    Fn::Equals:
+      - Ref: Environment
+      - stage
+  IsDevelopment:
+    Fn::Equals:
+      - Ref: Environment
+      - development
+
+Resources:
+  VpcDevelopmentStack:
+    Condition: IsDevelopment
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./networking_development.yaml
+      Parameters:
+        VpcCidrBlock:
+          Ref: VpcCidrBlock
+        Environment:
+          Ref: Environment
+
+  VpcStageStack:
+    Condition: IsStaging
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./networking_stage.yaml
+      Parameters:
+        VpcCidrBlock:
+          Ref: VpcCidrBlock
+        Environment:
+          Ref: Environment
+
+Outputs:
+  VPCId:
+    Description: Vpc Created
+    Value:
+      Fn::If:
+        - IsDevelopment
+        - Fn::GetAtt: VpcDevelopmentStack.Outputs.VPCId
+        - Fn::GetAtt: VpcStageStack.Outputs.VPCId
+
+  PrivateSubnetA:
+    Value:
+      Fn::If:
+        - IsDevelopment
+        - Fn::GetAtt: VpcDevelopmentStack.Outputs.InstanceSubnetA
+        - Fn::GetAtt: VpcStageStack.Outputs.PrivateSubnetA
+
+  PrivateSubnetB:
+    Value:
+      Fn::If:
+        - IsDevelopment
+        - Fn::GetAtt: VpcDevelopmentStack.Outputs.InstanceSubnetB
+        - Fn::GetAtt: VpcStageStack.Outputs.PrivateSubnetB
+
+  PublicSubnetA:
+    Value:
+      Fn::If:
+        - IsDevelopment
+        - Fn::GetAtt: VpcDevelopmentStack.Outputs.PublicSubnetA
+        - Fn::GetAtt: VpcStageStack.Outputs.PublicSubnetA
+
+  PublicSubnetB:
+    Value:
+      Fn::If:
+        - IsDevelopment
+        - Fn::GetAtt: VpcDevelopmentStack.Outputs.PublicSubnetB
+        - Fn::GetAtt: VpcStageStack.Outputs.PublicSubnetB
+
+  PrivateRouteTable:
+    Value:
+      Fn::If:
+        - IsStaging
+        - Fn::GetAtt: VpcStageStack.Outputs.PrivateRouteTable
+        - ''

@@ -1,0 +1,40 @@
+name: Deploy S# Bucket for packaging the app
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      AWS_Role:
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  CreateS3Bucket:
+    environment:
+      name: ${{ inputs.environment }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{secrets.AWS_ROLE }}
+
+      - name: AWS CloudFormation Deploy CloudFormation Stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.2.0
+        with:
+          name: s3-learning-tracking-package-bucket-stack
+          template: ./cloudformation/S3BucketPackage.yaml
+          parameter-overrides: BucketName=s3-learning-tracking-app
+          no-fail-on-empty-changeset: 1

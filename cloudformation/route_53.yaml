@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFormation Template for creating the Route 53 infra
+
+Parameters:
+  HostedZoneId:
+    Description: The id of the hosted zone
+    Type: String
+
+  DomainName:
+    Description: The Domain name
+    Type: String
+
+  LoadBalancerCanonicalHostedZoneID:
+    Type: String
+
+  LoadBalancerDNSName:
+    Type: String
+
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+Resources:
+  Route53RecordSets:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId:
+        Ref: HostedZoneId
+      RecordSets:
+        - Name:
+            Fn::Sub: api.${Environment}.${DomainName}
+          Type: A
+          AliasTarget:
+            HostedZoneId:
+              Ref: LoadBalancerCanonicalHostedZoneID
+            DNSName:
+              Ref: LoadBalancerDNSName
+        - Name:
+            Fn::Sub: www.api.${Environment}.${DomainName}
+          Type: A
+          AliasTarget:
+            HostedZoneId:
+              Ref: LoadBalancerCanonicalHostedZoneID
+            DNSName:
+              Ref: LoadBalancerDNSName

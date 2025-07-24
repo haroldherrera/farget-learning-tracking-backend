@@ -1,0 +1,134 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates Load balancing and related resources
+
+Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet::Id
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet::Id
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+
+  DomainName:
+    Type: String
+
+  HostedZoneId:
+    Type: String
+
+  CertificateArn:
+    Type: String
+
+Conditions:
+  IsStaging:
+    Fn::Equals:
+      - Ref: Environment
+      - stage
+
+  IsDevelopment:
+    Fn::Equals:
+      - Ref: Environment
+      - development
+
+Resources:
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckPort: traffic-port
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 3
+      IpAddressType: ipv4
+      Matcher:
+        HttpCode: '200-299'
+      Name:
+        Fn::Sub: ECSTargetGroup-${Environment}
+      TargetType: instance
+      Port: 3000
+      Protocol: HTTP
+      ProtocolVersion: HTTP1
+      UnhealthyThresholdCount: 2
+      VpcId:
+        Ref: VPC
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name:
+        Fn::Sub: ${Environment}-LoadBalancer
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '30'
+      Subnets:
+        - Ref: PublicSubnetA
+        - Ref: PublicSubnetB
+      SecurityGroups:
+        - Ref: LoadBalancerSecurityGroup
+
+  HttpsListenerStageStack:
+    DependsOn:
+      - LoadBalancer
+      - TargetGroup
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./https_listener_stage.yaml
+      Parameters:
+        TargetGroupArn:
+          Ref: TargetGroup
+        LoadBalancerArn:
+          Ref: LoadBalancer
+        DomainName:
+          Fn::Sub: api.${Environment}.${DomainName}
+        CertificateArn:
+          Ref: CertificateArn
+
+  # HttpsListenerDevelopmentStack:
+  #   Condition: IsDevelopment
+  #   DependsOn:
+  #     - LoadBalancer
+  #     - TargetGroup
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ./https_listener_development.yaml
+  #     Parameters:
+  #       TargetGroupArn:
+  #         Ref: TargetGroup
+  #       LoadBalancerArn:
+  #         Ref: LoadBalancer
+
+Outputs:
+  TargetGroupArn:
+    Value:
+      Ref: TargetGroup
+
+  LoadBalancerCanonicalHostedZoneID:
+    Value:
+      Fn::GetAtt:
+        - LoadBalancer
+        - CanonicalHostedZoneID
+
+  LoadBalancerDNSName:
+    Value:
+      Fn::GetAtt:
+        - LoadBalancer
+        - DNSName
+
+  LoadBalancerArn:
+    Value:
+      Ref: LoadBalancer

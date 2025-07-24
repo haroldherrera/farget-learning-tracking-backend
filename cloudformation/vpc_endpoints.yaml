@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFormation Template for the VPC endpoints so that the instances are isolated
+
+Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet::Id
+
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet::Id
+
+  VpcEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+
+  PrivateRouteTable:
+    Type: String
+
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+Resources:
+  ECRRegistry:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName:
+        Fn::Sub: com.amazonaws.${AWS::Region}.ecr.dkr
+      VpcId:
+        Ref: VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - Ref: PrivateSubnetA
+        - Ref: PrivateSubnetB
+      SecurityGroupIds:
+        - Ref: VpcEndpointSecurityGroup
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-ECRRegistry
+
+  ECRApi:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName:
+        Fn::Sub: com.amazonaws.${AWS::Region}.ecr.api
+      VpcId:
+        Ref: VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - Ref: PrivateSubnetA
+        - Ref: PrivateSubnetB
+      SecurityGroupIds:
+        - Ref: VpcEndpointSecurityGroup
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-ECRApi
+
+  ECSAgent:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName:
+        Fn::Sub: com.amazonaws.${AWS::Region}.ecs-agent
+      VpcId:
+        Ref: VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - Ref: PrivateSubnetA
+        - Ref: PrivateSubnetB
+      SecurityGroupIds:
+        - Ref: VpcEndpointSecurityGroup
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-ECSAgent
+
+  ECSEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName:
+        Fn::Sub: com.amazonaws.${AWS::Region}.ecs
+      VpcId:
+        Ref: VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - Ref: PrivateSubnetA
+        - Ref: PrivateSubnetB
+      SecurityGroupIds:
+        - Ref: VpcEndpointSecurityGroup
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-ECSEndpoint
+
+  CloudWatchLogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId:
+        Ref: VPC
+      ServiceName:
+        Fn::Sub: 'com.amazonaws.${AWS::Region}.logs'
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - Ref: PrivateSubnetA
+        - Ref: PrivateSubnetB
+      SecurityGroupIds:
+        - Ref: VpcEndpointSecurityGroup
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-CloudWatchLogsEndpoint
+
+  ECRTelemetry:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName:
+        Fn::Sub: com.amazonaws.${AWS::Region}.ecs-telemetry
+      VpcId:
+        Ref: VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - Ref: PrivateSubnetA
+        - Ref: PrivateSubnetB
+      SecurityGroupIds:
+        - Ref: VpcEndpointSecurityGroup
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-ECRTelemetry
+
+  ECRS3Bucket:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Gateway
+      ServiceName:
+        Fn::Sub: com.amazonaws.${AWS::Region}.s3
+      VpcId:
+        Ref: VPC
+      RouteTableIds:
+        - Ref: PrivateRouteTable
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${Environment}-ECRS3Bucket

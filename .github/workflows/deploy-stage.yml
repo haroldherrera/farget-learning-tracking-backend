@@ -1,0 +1,31 @@
+name: Main orchestration of the Githubactions
+
+on:
+  push:
+    branches:
+      - stage
+
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-s3-package-bucket-stage:
+    name: Deploy the S3 Bucket package for the app
+    uses: ./.github/workflows/deploy_s3_package.yml
+    with:
+      environment: stage
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+
+  deploy-ecr-stage:
+    needs: deploy-s3-package-bucket-stage
+    name: Deploy the ECR infrastructure for the app
+    uses: ./.github/workflows/deploy_app.yml
+    with:
+      environment: stage
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
+      HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID }}

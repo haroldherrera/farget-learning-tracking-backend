@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates the listener for HTTP for development
+
+Parameters:
+  TargetGroupArn:
+    Type: String
+  LoadBalancerArn:
+    Type: String
+  DomainName:
+    Type: String
+  CertificateArn:
+    Type: String
+
+Resources:
+  LoadBalancerListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Port: 443
+            Protocol: HTTPS
+            StatusCode: HTTP_301
+      LoadBalancerArn:
+        Ref: LoadBalancerArn
+      Port: 80
+      Protocol: HTTP
+
+  LoadBalancerListenerHTTPS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn:
+            Ref: CertificateArn
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            ContentType: text/plain
+            MessageBody: 'This is the Default'
+            StatusCode: 200
+      LoadBalancerArn:
+        Ref: LoadBalancerArn
+      Port: 443
+      Protocol: HTTPS
+
+  ListenerRuleHTTPS:
+    DependsOn: LoadBalancerListenerHTTPS
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      Actions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn:
+                  Ref: TargetGroupArn
+                Weight: 1
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - Ref: DomainName
+              - Fn::Sub: www.${DomainName}
+      ListenerArn:
+        Ref: LoadBalancerListenerHTTPS
+      Priority: 1

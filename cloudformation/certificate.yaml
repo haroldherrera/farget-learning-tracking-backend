@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates the Certificate for the app
+
+Parameters:
+  DomainName:
+    Description: The Domain name
+    Type: String
+
+  HostedZoneId:
+    Description: The id of the hosted zone
+    Type: String
+
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:
+        Ref: DomainName
+      SubjectAlternativeNames:
+        - Fn::Sub: www.api.${Environment}.${DomainName}
+        - Fn::Sub: api.${Environment}.${DomainName}
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName:
+            Ref: DomainName
+          HostedZoneId:
+            Ref: HostedZoneId
+        - DomainName:
+            Fn::Sub: api.${Environment}.${DomainName}
+          HostedZoneId:
+            Ref: HostedZoneId
+        - DomainName:
+            Fn::Sub: www.api.${Environment}.${DomainName}
+          HostedZoneId:
+            Ref: HostedZoneId
+
+Outputs:
+  CertificateArn:
+    Value:
+      Ref: Certificate
