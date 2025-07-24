@@ -51,92 +51,6 @@ Resources:
         - Name: containerInsights
           Value: enabled
 
-  LaunchTemplateEC2:
-    Type: AWS::EC2::LaunchTemplate
-    Properties:
-      LaunchTemplateName:
-        Fn::Sub: Learning-Tracking-${Environment}
-      LaunchTemplateData:
-        ImageId:
-          Ref: ECSAMI
-        InstanceType: t2.micro
-        IamInstanceProfile:
-          Name:
-            Ref: EC2InstanceProfile
-        NetworkInterfaces:
-          Fn::If:
-            - IsDevelopment
-            - - DeviceIndex: 0
-                Groups:
-                  - Ref: InstancesSecurityGroup
-                AssociatePublicIpAddress: true
-                DeleteOnTermination: true
-            - - DeviceIndex: 0
-                Groups:
-                  - Ref: InstancesSecurityGroup
-                DeleteOnTermination: true
-
-        MetadataOptions:
-          HttpEndpoint: enabled
-          HttpTokens: required
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash
-            yum update -y
-            echo "ECS_CLUSTER=${ECSCluster}" >> /etc/ecs/ecs.config
-
-  ECSAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      VPCZoneIdentifier:
-        - Ref: PrivateSubnetA
-        - Ref: PrivateSubnetB
-      LaunchTemplate:
-        LaunchTemplateId:
-          Ref: LaunchTemplateEC2
-        Version:
-          Fn::GetAtt: LaunchTemplateEC2.LatestVersionNumber
-      MinSize: 1
-      MaxSize: 15
-      DesiredCapacity: 1
-      TargetGroupARNs:
-        - Ref: TargetGroupArn
-      NewInstancesProtectedFromScaleIn: true
-      Tags:
-        - Key: Name
-          Value:
-            Fn::Sub: ${Environment}-ECSAutoScalingGroup
-          PropagateAtLaunch: true
-
-  CapacityProvider:
-    Type: AWS::ECS::CapacityProvider
-    Properties:
-      Name:
-        Fn::Sub: learning-tracking-capacity-provider-${Environment}
-      AutoScalingGroupProvider:
-        AutoScalingGroupArn:
-          Ref: ECSAutoScalingGroup
-        ManagedScaling:
-          InstanceWarmupPeriod: 60
-          MinimumScalingStepSize: 1
-          MaximumScalingStepSize: 1
-          Status: ENABLED
-          TargetCapacity: 100
-        ManagedTerminationProtection: ENABLED
-
-  CapacityProviderAssociation:
-    Type: AWS::ECS::ClusterCapacityProviderAssociations
-    Properties:
-      CapacityProviders:
-        - Ref: CapacityProvider
-      Cluster:
-        Ref: ECSCluster
-      DefaultCapacityProviderStrategy:
-        - Base: 0
-          CapacityProvider:
-            Ref: CapacityProvider
-          Weight: 1
-
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -144,9 +58,9 @@ Resources:
         Fn::Sub: learning-tracking-${Environment}
       Cpu: 512
       Memory: 512
-      NetworkMode: bridge
+      NetworkMode: awsvpc
       RequiresCompatibilities:
-        - EC2
+        - FARGATE
       ExecutionRoleArn:
         Ref: ECSTaskExecutionRole
       ContainerDefinitions:
@@ -187,20 +101,18 @@ Resources:
         Fn::Sub: learning-tracking-${Environment}
       Cluster:
         Ref: ECSCluster
-      PlacementStrategies:
-        - Field: cpu
-          Type: binpack
       CapacityProviderStrategy:
-        - CapacityProvider:
-            Ref: CapacityProvider
+        - base: 1
+          CapacityProvider: FARGATE
           Weight: 1
       DeploymentConfiguration:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enabled: true
+          Rollback: true
       DesiredCount: 2
       HealthCheckGracePeriodSeconds: 300
-      TaskDefinition:
-        Ref: TaskDefinition
       LoadBalancers:
         - ContainerName:
             Fn::Sub: learning-tracking-${Environment}
@@ -208,28 +120,41 @@ Resources:
           TargetGroupArn:
             Ref: TargetGroupArn
 
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: 'ENABLED'
+          SecurityGroups:
+            - Ref: InstancesSecurityGroup
+          Subnets:
+            - Ref: PrivateSubnetA
+            - Ref: PrivateSubnetB
+      PlatformVersion: LATEST
+      TaskDefinition:
+        Ref: TaskDefinition
+
   ServiceScalableTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
     Properties:
       MaxCapacity: 15
       MinCapacity: 1
-      ResourceId:
-        Fn::Sub: service/${ECSCluster}/${Service.Name}
       RoleARN:
         Fn::Sub: arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
-      ScalableDimension: ecs:service:DesiredCount
       ServiceNamespace: ecs
+      ScalableDimension: ecs:service:DesiredCount
+      ResourceId:
+        Fn::Sub: service/${ECSCluster}/${Service.Name}
 
   ServiceScalingPolicy:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
     Properties:
-      PolicyName: ECSContainerServiceScalingPolicy
       PolicyType: TargetTrackingScaling
+      PolicyName: ECSContainerServiceScalingPolicy
       ScalingTargetId:
         Ref: ServiceScalableTarget
+
       TargetTrackingScalingPolicyConfiguration:
         TargetValue: 50
         ScaleInCooldown: 60
-        ScaleOutCooldown: 60
+        ScaleOutCooldown: 180
         PredefinedMetricSpecification:
           PredefinedMetricType: ECSServiceAverageCPUUtilization
