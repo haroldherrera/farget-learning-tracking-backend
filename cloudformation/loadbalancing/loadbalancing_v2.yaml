@@ -65,7 +65,6 @@ Resources:
       UnhealthyThresholdCount: 2
       VpcId:
         Ref: VPC
-
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
