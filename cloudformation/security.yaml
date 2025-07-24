@@ -4,6 +4,7 @@ Description: CloudFormation Template for managing the security
 Parameters:
   VPC:
     Type: AWS::EC2::VPC::Id
+
   Environment:
     Description: development | stage |production
     Type: String
@@ -11,6 +12,12 @@ Parameters:
       - development
       - stage
       - production
+
+Conditions:
+  IsStaging:
+    Fn::Equals:
+      - Ref: Environment
+      - stage
 
 Resources:
   LoadBalancerSecurityGroup:
@@ -44,8 +51,8 @@ Resources:
       SecurityGroupIngress:
         - SourceSecurityGroupId:
             Ref: LoadBalancerSecurityGroup
-          FromPort: 32768
-          ToPort: 65535
+          FromPort: 3000
+          ToPort: 3000
           IpProtocol: tcp
       SecurityGroupEgress:
         - IpProtocol: tcp
@@ -58,6 +65,7 @@ Resources:
             Fn::Sub: Learning-Tracking-Instances-SG-{Environment}
 
   VpcEndpointSecurityGroup:
+    Condition: IsStaging
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: VpcEndpointSecurityGroup
@@ -78,10 +86,15 @@ Resources:
 Outputs:
   VpcEndpointSecurityGroup:
     Value:
-      Ref: VpcEndpointSecurityGroup
+      Fn::If:
+        - IsStaging
+        - Ref: VpcEndpointSecurityGroup
+        - ''
+
   LoadBalancerSecurityGroup:
     Value:
       Ref: LoadBalancerSecurityGroup
+
   InstancesSecurityGroup:
     Value:
       Ref: InstancesSecurityGroup
