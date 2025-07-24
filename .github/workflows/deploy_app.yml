@@ -51,7 +51,7 @@ jobs:
       - name: Obtain the ECR Stack name
         id: ECRImageName
         run: |
-          IMAGE_NAME=$(aws cloudformation describe-stacks --stack-name ecr-repo-stack-${{inputs.environment}} --query "Stacks[0].Outputs[0].OutputValue" --output text)
+          IMAGE_NAME=$(aws cloudformation describe-stacks --stack-name ecr-repo-stack-fargate-${{inputs.environment}} --query "Stacks[0].Outputs[0].OutputValue" --output text)
           echo "ImageName=${IMAGE_NAME}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
 
       - name: Build and push the docker image
