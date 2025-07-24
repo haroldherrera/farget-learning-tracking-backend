@@ -132,8 +132,6 @@ Resources:
       TaskDefinition:
         Ref: TaskDefinition
 
-Resource handler returned message: "Invalid request provided: The provided target group arn:aws:elasticloadbalancing:us-east-1:926989967422:targetgroup/ECSTargetGroup-development/d1163e80154c4cc8 has target type instance, which is incompatible with the awsvpc network mode specified in the task definition. (Service: Ecs, Status Code: 400, Request ID: d5e4c1a0-aabd-4b8e-84a2-fbebd1e6e787) (SDK Attempt Count: 1)" (RequestToken: 25985275-dc01-0017-65f0-df325133654f, HandlerErrorCode: InvalidRequest)
-
   # ServiceScalableTarget:
   #   Type: AWS::ApplicationAutoScaling::ScalableTarget
   #   Properties:
