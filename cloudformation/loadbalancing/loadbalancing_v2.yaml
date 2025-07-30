@@ -52,7 +52,7 @@ Resources:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 30
       HealthCheckPath:
-        Ref: HealthCheckPath
+        Sub: '/${HealthCheckPath}'
         # /health
       HealthCheckPort: traffic-port
       HealthCheckProtocol: HTTP
