@@ -31,6 +31,9 @@ Parameters:
   CertificateArn:
     Type: String
 
+  HealthCheckPath:
+    Type: String
+
 Conditions:
   IsStaging:
     Fn::Equals:
@@ -48,7 +51,9 @@ Resources:
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 30
-      HealthCheckPath: /
+      HealthCheckPath:
+        Ref: HealthCheckPath
+        # /health
       HealthCheckPort: traffic-port
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
