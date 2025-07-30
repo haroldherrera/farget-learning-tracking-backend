@@ -78,6 +78,6 @@ jobs:
             DomainName=${{ vars.DOMAIN_NAME }},
             ECRImage=${{ steps.ECRImageName.outputs.ImageName }},
             HealthCheckPath=${{vars.HEALTH_CHECK_PATH}},
-            CorsOrigins=${{vars.CORS_ORIGINS}}
+            CorsOrigins="${{vars.CORS_ORIGINS}}"
 
           no-fail-on-empty-changeset: 1

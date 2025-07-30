@@ -35,6 +35,7 @@ Parameters:
 
   CorsOrigins:
     Type: String
+    Default: http://localhost:51730,https://www.development.mastersweb.click,https://development.mastersweb.click,https://www.stage.mastersweb.click,https://stage.mastersweb.click
 
 Conditions:
   IsStaging:
