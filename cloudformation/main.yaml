@@ -30,6 +30,9 @@ Parameters:
     Description: The ECR image of the docker container to be deployed
     Type: String
 
+  HealthCheckPath:
+    Type: String
+
 Conditions:
   IsStaging:
     Fn::Equals:
@@ -123,6 +126,8 @@ Resources:
           Ref: HostedZoneId
         CertificateArn:
           Fn::GetAtt: CertificateStack.Outputs.CertificateArn
+        HealthCheckPath:
+          Ref: HealthCheckPath
 
   ECSContainerStack:
     DependsOn:
