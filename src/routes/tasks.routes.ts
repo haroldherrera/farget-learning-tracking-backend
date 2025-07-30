@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { listTasks } from '../controllers/tasks/listTasks.controller';
 import { createTask } from '../controllers/tasks/createTask.controller';
+import { validateSchema } from '../middlewares/schemaValidation';
+import { taskSchema } from '../@types/task';
 
 export const router = Router();
 
@@ -12,8 +14,9 @@ router.get('/', (req, res) => {
 });
 
 // Create a new task in the DB
-router.post('/', (req, res) => {
-  createTask(req.body.task);
+router.post('/', validateSchema(taskSchema), (req, res) => {
+  createTask(req.body);
+
   res.send({ message: 'Task Created' });
 });
 
