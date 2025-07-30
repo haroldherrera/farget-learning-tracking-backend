@@ -35,6 +35,10 @@ Parameters:
     Description: The ECR image of the docker container to be deployed
     Type: String
 
+  CorsOrigins:
+    Type: String
+    Default: http://localhost:51730,https://www.development.mastersweb.click,https://development.mastersweb.click,https://www.stage.mastersweb.click,https://stage.mastersweb.click
+
 Conditions:
   IsDevelopment:
     Fn::Equals:
@@ -70,6 +74,9 @@ Resources:
           Memory: 1024
           Image:
             Ref: ECRImage
+          Environment:
+            - CORS_ORIGINS:
+                Ref: CorsOrigins
           PortMappings:
             - ContainerPort: 3000
               HostPort: 3000
