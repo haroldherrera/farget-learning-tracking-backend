@@ -58,14 +58,13 @@ Resources:
         HttpCode: '200-299'
       Name:
         Fn::Sub: ECSTargetGroup-${Environment}
-      TargetType: instance
+      TargetType: ip
       Port: 3000
       Protocol: HTTP
       ProtocolVersion: HTTP1
       UnhealthyThresholdCount: 2
       VpcId:
         Ref: VPC
-
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
