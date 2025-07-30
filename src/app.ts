@@ -1,6 +1,7 @@
 import express from 'express';
 import { router } from './routes/tasks.routes';
 import cors from 'cors';
+import 'dotenv/config';
 // import helmet from 'helmet';
 
 const app = express();
@@ -8,13 +9,11 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://www.development.mastersweb.click',
-  'https://development.mastersweb.click',
-  'https://www.stage.mastersweb.click',
-  'https://stage.mastersweb.click',
-];
+const corsOrigins = process.env.CORS_ORIGINS || '';
+
+const allowedOrigins = corsOrigins.split(',');
+
+console.log(allowedOrigins);
 
 app.use(
   cors({
