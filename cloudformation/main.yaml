@@ -33,6 +33,10 @@ Parameters:
   HealthCheckPath:
     Type: String
 
+  CorsOrigins:
+    Type: String
+    Default: http://localhost:51730,https://www.development.mastersweb.click,https://development.mastersweb.click,https://www.stage.mastersweb.click,https://stage.mastersweb.click
+
 Conditions:
   IsStaging:
     Fn::Equals:
@@ -155,6 +159,8 @@ Resources:
           Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
         ECRImage:
           Ref: ECRImage
+        CorsOrigins:
+          Ref: CorsOrigins
 
   Route53Stack:
     DependsOn: LoadBalacingStack
