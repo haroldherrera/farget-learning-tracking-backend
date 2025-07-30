@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const allowedOrigins = [
-  // 'http://localhost:3000',
+  'http://localhost:3000',
   'https://www.development.mastersweb.click',
   'https://development.mastersweb.click',
   'https://www.stage.mastersweb.click',
