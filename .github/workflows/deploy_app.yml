@@ -79,4 +79,4 @@ jobs:
             ECRImage=${{ steps.ECRImageName.outputs.ImageName }},
             HealthCheckPath=${{vars.HEALTH_CHECK_PATH}}
 
-            no-fail-on-empty-changeset: 1
+          no-fail-on-empty-changeset: 1
