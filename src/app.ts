@@ -11,7 +11,6 @@ app.use('/tasks', router);
 
 app.use((req, res) => {
   res.status(404).send('Endpoint not found');
-
 });
 
 app.listen(3000, () => {
