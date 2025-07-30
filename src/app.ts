@@ -10,10 +10,10 @@ app.use(express.json());
 
 const allowedOrigins = [
   // 'http://localhost:3000',
-  'https://www.api.development.mastersweb.click/tasks',
-  'https://api.development.mastersweb.click/tasks',
-  'https://www.api.stage.mastersweb.click/tasks',
-  'https://api.stage.mastersweb.click/tasks',
+  'https://www.development.mastersweb.click/tasks',
+  'https://development.mastersweb.click/tasks',
+  'https://www.stage.mastersweb.click/tasks',
+  'https://stage.mastersweb.click/tasks',
 ];
 
 app.use(
