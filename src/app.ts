@@ -1,5 +1,6 @@
 import express from 'express';
 import { router } from './routes/tasks.routes';
+import cors from 'cors';
 // import helmet from 'helmet';
 
 const app = express();
@@ -7,16 +8,28 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, PATCH, DELETE'
-  );
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+const allowedOrigins = [
+  // 'http://localhost:3000',
+  'https://www.api.development.mastersweb.click/tasks',
+  'https://api.development.mastersweb.click/tasks',
+  'https://www.api.stage.mastersweb.click/tasks',
+  'https://api.stage.mastersweb.click/tasks',
+];
 
-  next();
-});
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // if using cookies or tokens in headers
+  })
+);
 
 app.use('/tasks', router);
 
