@@ -52,7 +52,7 @@ Resources:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 30
       HealthCheckPath:
-        Fn::Sub: '/${HealthCheckPath}'
+        Ref: HealthCheckPath
         # /health
       HealthCheckPort: traffic-port
       HealthCheckProtocol: HTTP
