@@ -9,6 +9,10 @@ app.use(express.json());
 
 app.use('/tasks', router);
 
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.use((req, res) => {
   res.status(404).send('Endpoint not found');
 });
