@@ -88,7 +88,7 @@ Resources:
           HealthCheck:
             Command:
               - CMD-SHELL
-              - curl -f http://localhost:3000/ || exit 1
+              - curl -f http://localhost:3000/health || exit 1
             Interval: 30
             Timeout: 5
             Retries: 3
@@ -102,7 +102,7 @@ Resources:
       Cluster:
         Ref: ECSCluster
       CapacityProviderStrategy:
-        - base: 1
+        - Base: 1
           CapacityProvider: FARGATE
           Weight: 1
       DeploymentConfiguration:
@@ -132,29 +132,29 @@ Resources:
       TaskDefinition:
         Ref: TaskDefinition
 
-  # ServiceScalableTarget:
-  #   Type: AWS::ApplicationAutoScaling::ScalableTarget
-  #   Properties:
-  #     MaxCapacity: 15
-  #     MinCapacity: 1
-  #     RoleARN:
-  #       Fn::Sub: arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
-  #     ServiceNamespace: ecs
-  #     ScalableDimension: ecs:service:DesiredCount
-  #     ResourceId:
-  #       Fn::Sub: service/${ECSCluster}/${Service.Name}
+  ServiceScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 15
+      MinCapacity: 1
+      RoleARN:
+        Fn::Sub: arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ServiceNamespace: ecs
+      ScalableDimension: ecs:service:DesiredCount
+      ResourceId:
+        Fn::Sub: service/${ECSCluster}/${Service.Name}
 
-  # ServiceScalingPolicy:
-  #   Type: AWS::ApplicationAutoScaling::ScalingPolicy
-  #   Properties:
-  #     PolicyType: TargetTrackingScaling
-  #     PolicyName: ECSContainerServiceScalingPolicy
-  #     ScalingTargetId:
-  #       Ref: ServiceScalableTarget
+  ServiceScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyType: TargetTrackingScaling
+      PolicyName: ECSContainerServiceScalingPolicy
+      ScalingTargetId:
+        Ref: ServiceScalableTarget
 
-  #     TargetTrackingScalingPolicyConfiguration:
-  #       TargetValue: 50
-  #       ScaleInCooldown: 60
-  #       ScaleOutCooldown: 180
-  #       PredefinedMetricSpecification:
-  #         PredefinedMetricType: ECSServiceAverageCPUUtilization
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 50
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 180
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
