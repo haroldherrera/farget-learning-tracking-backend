@@ -9,6 +9,8 @@
     "dev": "nodemon",
     "test": "jest",
     "lint": "eslint . --ext .ts",
+    "prisma_migrate": "npx prisma migrate dev",
+    "prisma_generate": "npx prisma generate",
     "prepare": "husky",
     "clean": "rm -rf dist"
   },
@@ -16,10 +18,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^6.13.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "xss": "^1.0.15",
     "zod": "^4.0.13"
   },
   "devDependencies": {
@@ -35,6 +39,7 @@
     "husky": "^9.1.7",
     "jest": "^30.0.4",
     "nodemon": "^3.1.10",
+    "prisma": "^6.13.0",
     "supertest": "^7.1.1",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",

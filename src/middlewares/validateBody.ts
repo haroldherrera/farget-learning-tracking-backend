@@ -1,7 +1,9 @@
 import { NextFunction, RequestHandler, Request } from 'express';
-import { ZodObject } from 'zod';
+import z from 'zod';
+import { sanitizeInput } from '../utils/sanitizeInput';
 
-export function validateSchema(schema: ZodObject): RequestHandler {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function validateBody(schema: z.ZodType<any>): RequestHandler {
   return (req: Request, res, next: NextFunction) => {
     const result = schema.safeParse(req.body);
 
@@ -14,7 +16,7 @@ export function validateSchema(schema: ZodObject): RequestHandler {
       return;
     }
 
-    req.body = result.data;
+    req.body = sanitizeInput(result.data);
 
     next();
   };

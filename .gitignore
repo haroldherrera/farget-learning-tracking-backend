@@ -45,3 +45,4 @@ coverage/
 
 **/packaged-monolithic-template.yaml
 **/packaged-template_stage.yaml
+/generated/prisma
