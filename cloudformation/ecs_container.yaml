@@ -38,6 +38,21 @@ Parameters:
   CorsOrigins:
     Type: String
 
+  MasterDBUsername:
+    Type: String
+
+  DBInstanceEndpoint:
+    Type: String
+
+  DBInstancePort:
+    Type: String
+
+  DBName:
+    Type: String
+
+  DBMasterUserSecretArn:
+    Type: String
+
 Conditions:
   IsDevelopment:
     Fn::Equals:
@@ -77,8 +92,14 @@ Resources:
             - Name: CORS_ORIGINS
               Value:
                 Ref: CorsOrigins
-            # - Name: DATABASE_URL
-            #   Value: 'postgresql://postgres:postgres@localhost:5432/postgres?schema=public'
+            - Name: DATABASE_URL
+              Value:
+                Fn::Sub:
+                  - >-
+                    'postgresql://${MasterDBUsername}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}?schema=public'
+                  - DBPassword:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+
           PortMappings:
             - ContainerPort: 3000
               HostPort: 3000

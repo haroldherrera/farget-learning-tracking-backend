@@ -140,6 +140,28 @@ Resources:
         HealthCheckPath:
           Ref: HealthCheckPath
 
+  RDSStack:
+    DependsOn:
+      - VPCStack
+      - SecurityStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./rds.yaml
+      Parameters:
+        SubnetIds:
+          Fn::Join:
+            - ','
+            - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+              - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        DBName:
+          Ref: DBName
+        MasterUsername:
+          Ref: MasterUsername
+        RDSSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
+        MasterDBUsername:
+          Type: String
+
   ECSContainerStack:
     DependsOn:
       - IAMStack
@@ -169,25 +191,16 @@ Resources:
         CorsOrigins:
           Ref: CorsOrigins
 
-  RDS:
-    DependsOn:
-      - VPCStack
-      - SecurityStack
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./rds.yaml
-      Parameters:
-        SubnetIds:
-          Fn::Join:
-            - ','
-            - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
-              - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        MasterDBUsername:
+          Ref: MasterDBUsername
+        DBInstanceEndpoint:
+          Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
+        DBInstancePort:
+          Fn::GetAtt: RDSStack.Outputs.DBInstancePort
         DBName:
-          Ref: DBName
-        MasterUsername:
-          Ref: MasterUsername
-        RDSSecurityGroup:
-          Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
+          Fn::GetAtt: RDSStack.Outputs.DBName
+        DBMasterUserSecretArn:
+          Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack
