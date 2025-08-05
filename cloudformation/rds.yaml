@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates the Database of the System
+
+Parameters:
+  SubnetIds:
+    Description: The array of the subnets where the RDS will be displayed
+    Type: CommaDelimitedList
+
+Resources:
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Jira Subnets
+      SubnetIds:
+        - Ref: SubnetIds
+    Tags:
+      - Key: Name
+        Value: JiraSubnetGroup
