@@ -189,16 +189,16 @@ Resources:
         CorsOrigins:
           Ref: CorsOrigins
 
-        MasterDBUsername:
-          Ref: MasterUsername
-        DBInstanceEndpoint:
-          Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
-        DBInstancePort:
-          Fn::GetAtt: RDSStack.Outputs.DBInstancePort
-        DBName:
-          Ref: DBName
-        DBMasterUserSecretArn:
-          Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
+        # MasterDBUsername:
+        #   Ref: MasterUsername
+        # DBInstanceEndpoint:
+        #   Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
+        # DBInstancePort:
+        #   Fn::GetAtt: RDSStack.Outputs.DBInstancePort
+        # DBName:
+        #   Ref: DBName
+        # DBMasterUserSecretArn:
+        #   Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack
