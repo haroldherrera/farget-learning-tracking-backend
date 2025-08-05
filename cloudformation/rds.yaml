@@ -66,20 +66,7 @@ Resources:
               - 'kms:ReEncrypt*'
               - 'kms:GenerateDataKey'
               - 'kms:GenerateDataKeyWithoutPlaintext'
-
             Resource: '*'
-          # - Sid: Allow RDS to use the key,
-          #   Effect: Allow,
-          #   Principal: {
-          #     Service: rds.amazonaws.com
-          #   },
-          #   Action: [
-          #     kms:Encrypt,
-          #     kms:Decrypt,
-          #     kms:GenerateDataKey*,
-          #     kms:DescribeKey
-          #   ],
-          #   Resource: *
 
   DBInstance:
     DependsOn: KMSKey
@@ -102,3 +89,44 @@ Resources:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
         Ref: DBSubnetGroup
+
+Outputs:
+  DBInstanceEndpoint:
+    Description: 'RDS Endpoint address to connect to the database'
+    Value:
+      Fn::GetAtt: Database.Endpoint.Address
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBEndpoint'
+
+  DBInstancePort:
+    Description: 'Port number for RDS'
+    Value:
+      Fn::GetAtt: Database.Endpoint.Port
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBPort'
+
+  DBName:
+    Description: 'Initial database name'
+    Value:
+      Ref: Database
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBName'
+
+  DBInstanceIdentifier:
+    Description: 'DB instance identifier'
+    Value:
+      Ref: Database
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBInstanceId'
+
+  DBMasterUserSecretArn:
+    Description: 'ARN of SecretsManager secret for DB master user credentials'
+    Value:
+      Fn::GetAtt: Database.MasterUserSecret.SecretArn
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'

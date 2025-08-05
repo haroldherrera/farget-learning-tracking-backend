@@ -77,6 +77,8 @@ Resources:
             - Name: CORS_ORIGINS
               Value:
                 Ref: CorsOrigins
+            # - Name: DATABASE_URL
+            #   Value: 'postgresql://postgres:postgres@localhost:5432/postgres?schema=public'
           PortMappings:
             - ContainerPort: 3000
               HostPort: 3000
