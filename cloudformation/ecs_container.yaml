@@ -92,13 +92,13 @@ Resources:
             - Name: CORS_ORIGINS
               Value:
                 Ref: CorsOrigins
-            # - Name: DATABASE_URL
-            #   Value:
-            #     Fn::Sub:
-            #       - >-
-            #         postgresql://${MasterDBUsername}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}?schema=public
-            #       - DBPassword:
-            #           Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+            - Name: DATABASE_URL
+              Value:
+                Fn::Sub:
+                  - >-
+                    postgresql://${MasterDBUsername}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}?schema=public
+                  - DBPassword:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
           PortMappings:
             - ContainerPort: 3000
