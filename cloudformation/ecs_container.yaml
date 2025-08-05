@@ -38,8 +38,8 @@ Parameters:
   CorsOrigins:
     Type: String
 
-  MasterDBUsername:
-    Type: String
+  # MasterDBUsername:
+  #   Type: String
 
   # DBInstanceEndpoint:
   #   Type: String
@@ -47,8 +47,8 @@ Parameters:
   # DBInstancePort:
   #   Type: String
 
-  DBName:
-    Type: String
+  # DBName:
+  #   Type: String
 
   # DBMasterUserSecretArn:
   #   Type: String
