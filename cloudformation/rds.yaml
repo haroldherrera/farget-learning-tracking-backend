@@ -50,8 +50,7 @@ Resources:
       EnableKeyRotation: True
       KeyPolicy:
         Version: '2012-10-17'
-        Id:
-          Ref: jira_KMSKey
+        Id: jira_KMSKey
         Statement:
           - Sid: 'Allow administration of the key'
             Effect: 'Allow'
