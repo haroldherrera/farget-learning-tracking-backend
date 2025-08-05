@@ -34,16 +34,14 @@ Resources:
       EnableKeyRotation: True
       KeyPolicy:
         Version: '2012-10-17'
-        Id: jira_KMSKey
+        Id: allow-root-account
         Statement:
-          - Sid: 'Allow administration of the key'
-            Effect: 'Allow'
+          - Sid: AllowRootAccountFullAccess
+            Effect: Allow
             Principal:
-              AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
-            Action:
-              - kms:Encrypt
-              - kms:Decrypt
-              - kms:GenerateDataKey
+              AWS:
+                Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+            Action: 'kms:*'
             Resource: '*'
 
   DBInstance:
