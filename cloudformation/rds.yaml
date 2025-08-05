@@ -12,9 +12,6 @@ Parameters:
   RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup::Id
 
-  MasterUsername:
-    Type: String
-
 Resources:
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -69,7 +66,6 @@ Resources:
             Resource: '*'
 
   DBMasterUserSecret:
-    DependsOn: KMSKey
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: jira-db-master-secret
@@ -93,9 +89,9 @@ Resources:
       DBName:
         Ref: DBName
       Engine: postgres
-      MasterUsername:
-        Ref: MasterUsername
-      ManageMasterUserPassword: true
+      # MasterUsername:
+      #   Ref: MasterUsername
+      # ManageMasterUserPassword: true
       MasterUserSecret:
         SecretArn:
           Ref: DBMasterUserSecret
@@ -140,7 +136,7 @@ Outputs:
   DBMasterUserSecretArn:
     Description: 'ARN of SecretsManager secret for DB master user credentials'
     Value:
-      Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
+      Ref: DBMasterUserSecret
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'

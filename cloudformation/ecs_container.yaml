@@ -38,9 +38,6 @@ Parameters:
   CorsOrigins:
     Type: String
 
-  MasterDBUsername:
-    Type: String
-
   DBInstanceEndpoint:
     Type: String
 
@@ -96,7 +93,9 @@ Resources:
               Value:
                 Fn::Sub:
                   - >-
-                    postgresql://${MasterDBUsername}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}?schema=public
+                    postgresql://${DBUsername}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}?schema=public
+                  - DBUsername:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
                   - DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
