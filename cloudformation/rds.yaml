@@ -75,6 +75,7 @@ Resources:
         GenerateStringKey: password
         PasswordLength: 32
         ExcludeCharacters: '"@:;`'
+        RequireEachIncludedType: true
       KmsKeyId:
         Ref: KMSKey
 
