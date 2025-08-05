@@ -48,12 +48,25 @@ Resources:
             Principal:
               AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
             Action:
+              - 'kms:Create*'
+              - 'kms:Describe*'
+              - 'kms:Enable*'
+              - 'kms:List*'
+              - 'kms:Put*'
+              - 'kms:Update*'
+              - 'kms:Revoke*'
+              - 'kms:Disable*'
+              - 'kms:Get*'
+              - 'kms:Delete*'
+              - 'kms:ScheduleKeyDeletion'
+              - 'kms:CancelKeyDeletion'
               - 'kms:DescribeKey'
               - 'kms:Encrypt'
               - 'kms:Decrypt'
               - 'kms:ReEncrypt*'
               - 'kms:GenerateDataKey'
               - 'kms:GenerateDataKeyWithoutPlaintext'
+
             Resource: '*'
           # - Sid: Allow RDS to use the key,
           #   Effect: Allow,
