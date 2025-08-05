@@ -27,7 +27,26 @@ Resources:
         - Key: Name
           Value: JiraSubnetGroup
 
+  KMSKey:
+    Type: 'AWS::KMS::Key'
+    Properties:
+      Description: Manual test KMS key
+      EnableKeyRotation: True
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: jira_KMSKey
+        Statement:
+          - Sid: 'Allow administration of the key'
+            Effect: 'Allow'
+            Principal:
+              AWS:
+                Fn::Sub: 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
+            Action:
+              - 'kms:*'
+            Resource: '*'
+
   DBInstance:
+    DependsOn: KMSKey
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
     Properties:
@@ -47,21 +66,3 @@ Resources:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
         Ref: DBSubnetGroup
-
-  KMSKey:
-    Type: 'AWS::KMS::Key'
-    Properties:
-      Description: Manual test KMS key
-      EnableKeyRotation: True
-      KeyPolicy:
-        Version: '2012-10-17'
-        Id: jira_KMSKey
-        Statement:
-          - Sid: 'Allow administration of the key'
-            Effect: 'Allow'
-            Principal:
-              AWS:
-                Fn::Sub: 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
-            Action:
-              - 'kms:*'
-            Resource: '*'
