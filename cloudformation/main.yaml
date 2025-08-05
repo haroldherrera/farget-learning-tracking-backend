@@ -198,7 +198,7 @@ Resources:
         DBInstancePort:
           Fn::GetAtt: RDSStack.Outputs.DBInstancePort
         DBName:
-          Fn::GetAtt: RDSStack.Outputs.DBName
+          Ref: DBName
         DBMasterUserSecretArn:
           Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
