@@ -12,6 +12,9 @@ Parameters:
   RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup::Id
 
+  MasterUsername:
+    Type: String
+
 Resources:
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -34,6 +37,8 @@ Resources:
       DBName:
         Ref: DBName
       Engine: postgres
+      MasterUsername:
+        Ref: MasterUsername
       ManageMasterUserPassword: true
       MasterUserSecret:
         KmsKeyId:
