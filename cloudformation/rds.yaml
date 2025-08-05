@@ -66,11 +66,6 @@ Resources:
               - 'kms:ReEncrypt*'
               - 'kms:GenerateDataKey'
               - 'kms:GenerateDataKeyWithoutPlaintext'
-              - 'secretsmanager:CreateSecret'
-              - 'secretsmanager:PutSecretValue'
-              - 'secretsmanager:GetSecretValue'
-              - 'secretsmanager:DescribeSecret'
-              - 'secretsmanager:GetRandomPassword'
             Resource: '*'
 
   DBMasterUserSecret:
