@@ -140,25 +140,25 @@ Resources:
         HealthCheckPath:
           Ref: HealthCheckPath
 
-  # RDSStack:
-  #   DependsOn:
-  #     - VPCStack
-  #     - SecurityStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ./rds.yaml
-  #     Parameters:
-  #       SubnetIds:
-  #         Fn::Join:
-  #           - ','
-  #           - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
-  #             - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
-  #       DBName:
-  #         Ref: DBName
-  #       MasterUsername:
-  #         Ref: MasterUsername
-  #       RDSSecurityGroup:
-  #         Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
+  RDSStack:
+    DependsOn:
+      - VPCStack
+      - SecurityStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./rds.yaml
+      Parameters:
+        SubnetIds:
+          Fn::Join:
+            - ','
+            - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+              - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        DBName:
+          Ref: DBName
+        MasterUsername:
+          Ref: MasterUsername
+        RDSSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
 
   ECSContainerStack:
     DependsOn:
@@ -189,16 +189,16 @@ Resources:
         CorsOrigins:
           Ref: CorsOrigins
 
-        # MasterDBUsername:
-        #   Ref: MasterUsername
-        # DBInstanceEndpoint:
-        #   Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
-        # DBInstancePort:
-        #   Fn::GetAtt: RDSStack.Outputs.DBInstancePort
-        # DBName:
-        #   Ref: DBName
-        # DBMasterUserSecretArn:
-        #   Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
+        MasterDBUsername:
+          Ref: MasterUsername
+        DBInstanceEndpoint:
+          Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
+        DBInstancePort:
+          Fn::GetAtt: RDSStack.Outputs.DBInstancePort
+        DBName:
+          Ref: DBName
+        DBMasterUserSecretArn:
+          Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack
