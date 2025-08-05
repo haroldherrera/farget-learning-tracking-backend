@@ -64,6 +64,24 @@ Resources:
           Value:
             Fn::Sub: Learning-Tracking-Instances-SG-{Environment}
 
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: RDSSecurityGroup
+      GroupDescription: RDSSecurityGroup
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+        - SourceSecurityGroupId:
+            Ref: InstancesSecurityGroup
+          FromPort: 5432
+          ToPort: 5432
+          IpProtocol: tcp
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Learning-Tracking-RDS-SG-{Environment}
+
   VpcEndpointSecurityGroup:
     Condition: IsStaging
     Type: AWS::EC2::SecurityGroup
@@ -98,3 +116,7 @@ Outputs:
   InstancesSecurityGroup:
     Value:
       Ref: InstancesSecurityGroup
+
+  RDSSecurityGroup:
+    Value:
+      Ref: RDSSecurityGroup

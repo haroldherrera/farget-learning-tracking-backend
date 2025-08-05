@@ -15,6 +15,9 @@ on:
       HOSTED_ZONE_ID:
         required: true
 
+      DBName:
+        required: true
+
 jobs:
   CreateRepoECR:
     environment:
@@ -78,6 +81,7 @@ jobs:
             DomainName=${{ vars.DOMAIN_NAME }},
             ECRImage=${{ steps.ECRImageName.outputs.ImageName }},
             HealthCheckPath=${{vars.HEALTH_CHECK_PATH}},
-            CorsOrigins="${{vars.CORS_ORIGINS}}"
+            CorsOrigins="${{vars.CORS_ORIGINS}}",
+            DBName=${{secrets.DBName}}
 
           no-fail-on-empty-changeset: 1

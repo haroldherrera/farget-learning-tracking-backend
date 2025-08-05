@@ -42,6 +42,10 @@ Conditions:
     Fn::Equals:
       - Ref: Environment
       - stage
+
+DBName:
+  Type: String
+
 Resources:
   CertificateStack:
     Type: AWS::CloudFormation::Stack
@@ -175,6 +179,11 @@ Resources:
             - ','
             - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
               - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        DBName:
+          Ref: DBName
+
+        RDSSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
 
   Route53Stack:
     DependsOn: LoadBalacingStack
