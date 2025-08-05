@@ -192,7 +192,7 @@ Resources:
           Ref: CorsOrigins
 
         MasterDBUsername:
-          Ref: MasterDBUsername
+          Ref: MasterUsername
         DBInstanceEndpoint:
           Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
         DBInstancePort:
