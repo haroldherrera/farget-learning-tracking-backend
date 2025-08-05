@@ -94,7 +94,7 @@ Outputs:
   DBInstanceEndpoint:
     Description: 'RDS Endpoint address to connect to the database'
     Value:
-      Fn::GetAtt: Database.Endpoint.Address
+      Fn::GetAtt: DBInstance.Endpoint.Address
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBEndpoint'
@@ -102,7 +102,7 @@ Outputs:
   DBInstancePort:
     Description: 'Port number for RDS'
     Value:
-      Fn::GetAtt: Database.Endpoint.Port
+      Fn::GetAtt: DBInstance.Endpoint.Port
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBPort'
@@ -110,7 +110,7 @@ Outputs:
   DBName:
     Description: 'Initial database name'
     Value:
-      Ref: Database
+      Ref: DBInstance
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBName'
@@ -118,7 +118,7 @@ Outputs:
   DBInstanceIdentifier:
     Description: 'DB instance identifier'
     Value:
-      Ref: Database
+      Ref: DBInstance
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBInstanceId'
@@ -126,7 +126,7 @@ Outputs:
   DBMasterUserSecretArn:
     Description: 'ARN of SecretsManager secret for DB master user credentials'
     Value:
-      Fn::GetAtt: Database.MasterUserSecret.SecretArn
+      Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
