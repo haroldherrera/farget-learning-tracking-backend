@@ -68,8 +68,22 @@ Resources:
               - 'kms:GenerateDataKeyWithoutPlaintext'
             Resource: '*'
 
-  DBInstance:
+  DBMasterUserSecret:
     DependsOn: KMSKey
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: jira-db-master-secret
+      Description: Master DB credentials
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "postgres"}'
+        GenerateStringKey: password
+        PasswordLength: 32
+        ExcludeCharacters: '"@/\\[]:;<>#%{}|^~`'
+      KmsKeyId:
+        Ref: KMSKey
+
+  DBInstance:
+    DependsOn: DBMasterUserSecret
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
     Properties:
@@ -83,8 +97,8 @@ Resources:
         Ref: MasterUsername
       ManageMasterUserPassword: true
       MasterUserSecret:
-        KmsKeyId:
-          Ref: KMSKey
+        SecretArn:
+          Ref: DBMasterUserSecret
       VPCSecurityGroups:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
