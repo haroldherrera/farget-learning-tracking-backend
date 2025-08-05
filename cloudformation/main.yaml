@@ -40,6 +40,9 @@ Parameters:
   DBName:
     Type: String
 
+  MasterUsername:
+    Type: String
+
 Conditions:
   IsStaging:
     Fn::Equals:
@@ -181,7 +184,8 @@ Resources:
               - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
         DBName:
           Ref: DBName
-
+        MasterUsername:
+          Ref: MasterUsername
         RDSSecurityGroup:
           Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
 
