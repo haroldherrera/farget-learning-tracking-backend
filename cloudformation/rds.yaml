@@ -12,7 +12,7 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Jira Subnets
       SubnetIds:
-        - Ref: SubnetIds
+        Ref: SubnetIds
       Tags:
         - Key: Name
           Value: JiraSubnetGroup
