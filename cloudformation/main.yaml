@@ -37,14 +37,14 @@ Parameters:
     Type: String
     Default: http://localhost:51730,https://www.development.mastersweb.click,https://development.mastersweb.click,https://www.stage.mastersweb.click,https://stage.mastersweb.click
 
+  DBName:
+    Type: String
+
 Conditions:
   IsStaging:
     Fn::Equals:
       - Ref: Environment
       - stage
-
-DBName:
-  Type: String
 
 Resources:
   CertificateStack:
