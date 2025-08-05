@@ -4,7 +4,7 @@ Description: Creates the Database of the System
 Parameters:
   SubnetIds:
     Description: The array of the subnets where the RDS will be displayed
-    Type: CommaDelimitedList
+    Type: List<String>
 
 Resources:
   DBSubnetGroup:
