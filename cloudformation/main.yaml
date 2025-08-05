@@ -171,8 +171,10 @@ Resources:
       TemplateURL: ./rds.yaml
       Parameters:
         SubnetIds:
-          - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
-          - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+          Fn::Join:
+            - ','
+            - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+              - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
 
   Route53Stack:
     DependsOn: LoadBalacingStack
