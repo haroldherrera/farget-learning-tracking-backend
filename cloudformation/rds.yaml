@@ -43,6 +43,16 @@ Resources:
                 Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
             Action: 'kms:*'
             Resource: '*'
+          - Sid: Allow GitHub Actions to use KMS key,
+            Effect: Allow,
+            Principal:
+              AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
+            Action:
+              - kms:Encrypt,
+              - kms:Decrypt,
+              - kms:GenerateDataKey*,
+              - kms:DescribeKey
+            Resource: '*'
 
   DBInstance:
     DependsOn: KMSKey
