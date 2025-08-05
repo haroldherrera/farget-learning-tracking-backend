@@ -6,13 +6,39 @@ Parameters:
     Description: The array of the subnets where the RDS will be displayed
     Type: List<String>
 
+  DBName:
+    Type: String
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+
 Resources:
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Jira Subnets
+      DBSubnetGroupName: jira-subnetGroup
       SubnetIds:
         Ref: SubnetIds
       Tags:
         - Key: Name
           Value: JiraSubnetGroup
+
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      AllocatedStorage: 5
+      BackupRetentionPeriod: 0
+      DBInstanceClass: db.t3.micro
+      DBName:
+        Ref: DBName
+      Engine: postgres
+      ManageMasterUserPassword: true
+      MasterUserSecret:
+        Description:
+          Fn::Sub: 'Auto-generated master user secret for ${DBName}'
+      VPCSecurityGroups:
+        - Ref: RDSSecurityGroup
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
