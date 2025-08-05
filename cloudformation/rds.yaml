@@ -36,9 +36,28 @@ Resources:
       Engine: postgres
       ManageMasterUserPassword: true
       MasterUserSecret:
-        Description:
-          Fn::Sub: 'Auto-generated master user secret for ${DBName}'
+        KmsKeyId:
+          Ref: KMSKey
       VPCSecurityGroups:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
         Ref: DBSubnetGroup
+
+  KMSKey:
+    Type: 'AWS::KMS::Key'
+    Properties:
+      Description: Manual test KMS key
+      EnableKeyRotation: True
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id:
+          Ref: jira_KMSKey
+        Statement:
+          - Sid: 'Allow administration of the key'
+            Effect: 'Allow'
+            Principal:
+              AWS:
+                Fn::Sub: 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
+            Action:
+              - 'kms:*'
+            Resource: '*'
