@@ -162,6 +162,18 @@ Resources:
         CorsOrigins:
           Ref: CorsOrigins
 
+  RDS:
+    DependsOn:
+      - VPCStack
+      - SecurityStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./rds.yaml
+      Parameters:
+        SubnetIds:
+          - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+          - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+
   Route53Stack:
     DependsOn: LoadBalacingStack
     Type: AWS::CloudFormation::Stack
