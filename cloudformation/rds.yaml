@@ -39,10 +39,11 @@ Resources:
           - Sid: 'Allow administration of the key'
             Effect: 'Allow'
             Principal:
-              AWS:
-                Fn::Sub: 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
+              AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
             Action:
-              - 'kms:*'
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:GenerateDataKey
             Resource: '*'
 
   DBInstance:
