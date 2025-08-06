@@ -88,12 +88,9 @@ Resources:
       AllocatedStorage: 5
       BackupRetentionPeriod: 0
       DBInstanceClass: db.t3.micro
-      DBName:
-        Ref: DBName
+      # DBName:
+      #   Ref: DBName
       Engine: postgres
-      # MasterUsername:
-      #   Ref: MasterUsername
-      # ManageMasterUserPassword: true
       MasterUserSecret:
         SecretArn:
           Ref: DBMasterUserSecret
