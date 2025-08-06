@@ -3,6 +3,8 @@ import { sendErrorResponse } from '../utils/prismaErrorHandler';
 import { Request, Response } from 'express';
 
 export async function listTasks(req: Request, res: Response) {
+  console.log('This is the DBUrl', process.env.DATABASE_URL);
+  console.error('This is the DBUrl', process.env.DATABASE_URL);
   try {
     const tasks = await prisma.task.findMany();
     res
