@@ -47,8 +47,8 @@ Parameters:
   DBName:
     Type: String
 
-  DBMasterUserSecretArn:
-    Type: String
+  # DBMasterUserSecretArn:
+  #   Type: String
 
 Conditions:
   IsDevelopment:
@@ -94,8 +94,8 @@ Resources:
                 Fn::Sub:
                   - >-
                     postgresql://MyName:MyPassword@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-                  - DBPassword:
-                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+                  # - DBPassword:
+                  #     Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
           PortMappings:
             - ContainerPort: 3000

@@ -136,10 +136,10 @@ Outputs:
       Name:
         Fn::Sub: '${AWS::StackName}-DBInstanceId'
 
-  DBMasterUserSecretArn:
-    Description: 'ARN of SecretsManager secret for DB master user credentials'
-    Value:
-      Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
-    Export:
-      Name:
-        Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
+  # DBMasterUserSecretArn:
+  #   Description: 'ARN of SecretsManager secret for DB master user credentials'
+  #   Value:
+  #     Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
+  #   Export:
+  #     Name:
+  #       Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
