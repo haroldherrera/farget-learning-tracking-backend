@@ -24,46 +24,46 @@ Resources:
         - Key: Name
           Value: JiraSubnetGroup
 
-  KMSKey:
-    Type: 'AWS::KMS::Key'
-    Properties:
-      Description: Manual test KMS key
-      EnableKeyRotation: True
-      KeyPolicy:
-        Version: '2012-10-17'
-        Id: allow-root-account
-        Statement:
-          - Sid: AllowRootAccountFullAccess
-            Effect: Allow
-            Principal:
-              AWS:
-                Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
-            Action: 'kms:*'
-            Resource: '*'
-          - Sid: Allow GitHub Actions to use KMS key
-            Effect: Allow
-            Principal:
-              AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
-            Action:
-              - 'kms:Create*'
-              - 'kms:Describe*'
-              - 'kms:Enable*'
-              - 'kms:List*'
-              - 'kms:Put*'
-              - 'kms:Update*'
-              - 'kms:Revoke*'
-              - 'kms:Disable*'
-              - 'kms:Get*'
-              - 'kms:Delete*'
-              - 'kms:ScheduleKeyDeletion'
-              - 'kms:CancelKeyDeletion'
-              - 'kms:DescribeKey'
-              - 'kms:Encrypt'
-              - 'kms:Decrypt'
-              - 'kms:ReEncrypt*'
-              - 'kms:GenerateDataKey'
-              - 'kms:GenerateDataKeyWithoutPlaintext'
-            Resource: '*'
+  # KMSKey:
+  #   Type: 'AWS::KMS::Key'
+  #   Properties:
+  #     Description: Manual test KMS key
+  #     EnableKeyRotation: True
+  #     KeyPolicy:
+  #       Version: '2012-10-17'
+  #       Id: allow-root-account
+  #       Statement:
+  #         - Sid: AllowRootAccountFullAccess
+  #           Effect: Allow
+  #           Principal:
+  #             AWS:
+  #               Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+  #           Action: 'kms:*'
+  #           Resource: '*'
+  #         - Sid: Allow GitHub Actions to use KMS key
+  #           Effect: Allow
+  #           Principal:
+  #             AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
+  #           Action:
+  #             - 'kms:Create*'
+  #             - 'kms:Describe*'
+  #             - 'kms:Enable*'
+  #             - 'kms:List*'
+  #             - 'kms:Put*'
+  #             - 'kms:Update*'
+  #             - 'kms:Revoke*'
+  #             - 'kms:Disable*'
+  #             - 'kms:Get*'
+  #             - 'kms:Delete*'
+  #             - 'kms:ScheduleKeyDeletion'
+  #             - 'kms:CancelKeyDeletion'
+  #             - 'kms:DescribeKey'
+  #             - 'kms:Encrypt'
+  #             - 'kms:Decrypt'
+  #             - 'kms:ReEncrypt*'
+  #             - 'kms:GenerateDataKey'
+  #             - 'kms:GenerateDataKeyWithoutPlaintext'
+  #           Resource: '*'
 
   # DBMasterUserSecret:
   #   DependsOn: KMSKey
@@ -136,7 +136,7 @@ Outputs:
       Name:
         Fn::Sub: '${AWS::StackName}-DBInstanceId'
 
-  # DBMasterUserSecretArn:
+  # DBMasterUserSecretArn```````````````````````````````````````````````````````lcx 6+66588/8`:
   #   Description: 'ARN of SecretsManager secret for DB master user credentials'
   #   Value:
   #     Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
