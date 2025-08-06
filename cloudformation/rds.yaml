@@ -66,6 +66,7 @@ Resources:
             Resource: '*'
 
   DBMasterUserSecret:
+    DependsOn: KMSKey
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: jira-db-master-secret
@@ -74,7 +75,7 @@ Resources:
         SecretStringTemplate: '{"username": "postgres"}'
         GenerateStringKey: password
         PasswordLength: 32
-        ExcludeCharacters: '"@:/;%^|`\\'
+        ExcludeCharacters: '"@/\:'
         RequireEachIncludedType: true
       KmsKeyId:
         Ref: KMSKey
