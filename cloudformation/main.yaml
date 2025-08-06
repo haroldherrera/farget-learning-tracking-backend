@@ -192,8 +192,8 @@ Resources:
           Fn::GetAtt: RDSStack.Outputs.DBInstancePort
         DBName:
           Ref: DBName
-        DBMasterUserSecretArn:
-          Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
+        # DBMasterUserSecretArn:
+        #   Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack
