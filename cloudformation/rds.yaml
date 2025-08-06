@@ -75,65 +75,65 @@ Resources:
         SecretStringTemplate: '{"username": "postgres"}'
         GenerateStringKey: password
         PasswordLength: 32
-        ExcludeCharacters: '"@/\:'
+        ExcludeCharacters: '@:'
         RequireEachIncludedType: true
       KmsKeyId:
         Ref: KMSKey
 
-  # DBInstance:
-  #   DependsOn: DBMasterUserSecret
-  #   Type: AWS::RDS::DBInstance
-  #   DeletionPolicy: Delete
-  #   Properties:
-  #     AllocatedStorage: 5
-  #     BackupRetentionPeriod: 0
-  #     DBInstanceClass: db.t3.micro
-  #     DBName:
-  #       Ref: DBName
-  #     Engine: postgres
-  #     # MasterUsername:
-  #     #   Ref: MasterUsername
-  #     # ManageMasterUserPassword: true
-  #     MasterUserSecret:
-  #       SecretArn:
-  #         Ref: DBMasterUserSecret
-  #     VPCSecurityGroups:
-  #       - Ref: RDSSecurityGroup
-  #     DBSubnetGroupName:
-  #       Ref: DBSubnetGroup
+  DBInstance:
+    DependsOn: DBMasterUserSecret
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      AllocatedStorage: 5
+      BackupRetentionPeriod: 0
+      DBInstanceClass: db.t3.micro
+      DBName:
+        Ref: DBName
+      Engine: postgres
+      # MasterUsername:
+      #   Ref: MasterUsername
+      # ManageMasterUserPassword: true
+      MasterUserSecret:
+        SecretArn:
+          Ref: DBMasterUserSecret
+      VPCSecurityGroups:
+        - Ref: RDSSecurityGroup
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
 
 Outputs:
-  # DBInstanceEndpoint:
-  #   Description: 'RDS Endpoint address to connect to the database'
-  #   Value:
-  #     Fn::GetAtt: DBInstance.Endpoint.Address
-  #   Export:
-  #     Name:
-  #       Fn::Sub: '${AWS::StackName}-DBEndpoint'
+  DBInstanceEndpoint:
+    Description: 'RDS Endpoint address to connect to the database'
+    Value:
+      Fn::GetAtt: DBInstance.Endpoint.Address
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBEndpoint'
 
-  # DBInstancePort:
-  #   Description: 'Port number for RDS'
-  #   Value:
-  #     Fn::GetAtt: DBInstance.Endpoint.Port
-  #   Export:
-  #     Name:
-  #       Fn::Sub: '${AWS::StackName}-DBPort'
+  DBInstancePort:
+    Description: 'Port number for RDS'
+    Value:
+      Fn::GetAtt: DBInstance.Endpoint.Port
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBPort'
 
-  # DBName:
-  #   Description: 'Initial database name'
-  #   Value:
-  #     Ref: DBInstance
-  #   Export:
-  #     Name:
-  #       Fn::Sub: '${AWS::StackName}-DBName'
+  DBName:
+    Description: 'Initial database name'
+    Value:
+      Ref: DBInstance
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBName'
 
-  # DBInstanceIdentifier:
-  #   Description: 'DB instance identifier'
-  #   Value:
-  #     Ref: DBInstance
-  #   Export:
-  #     Name:
-  #       Fn::Sub: '${AWS::StackName}-DBInstanceId'
+  DBInstanceIdentifier:
+    Description: 'DB instance identifier'
+    Value:
+      Ref: DBInstance
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBInstanceId'
 
   DBMasterUserSecretArn:
     Description: 'ARN of SecretsManager secret for DB master user credentials'
@@ -145,4 +145,4 @@ Outputs:
 
   Password:
     Value:
-      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecret.Arn}:SecretString:password}}'
+      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecret}:SecretString:password}}'

@@ -186,14 +186,14 @@ Resources:
           Ref: ECRImage
         CorsOrigins:
           Ref: CorsOrigins
-        # DBInstanceEndpoint:
-        #   Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
-        # DBInstancePort:
-        #   Fn::GetAtt: RDSStack.Outputs.DBInstancePort
-        # DBName:
-        #   Ref: DBName
-        # DBMasterUserSecretArn:
-        #   Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
+        DBInstanceEndpoint:
+          Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
+        DBInstancePort:
+          Fn::GetAtt: RDSStack.Outputs.DBInstancePort
+        DBName:
+          Ref: DBName
+        DBMasterUserSecretArn:
+          Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack
