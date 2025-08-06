@@ -74,7 +74,7 @@ Resources:
       GenerateSecretString:
         SecretStringTemplate: '{"username": "postgres"}'
         GenerateStringKey: password
-        PasswordLength: 32
+        PasswordLength: 14
         ExcludeCharacters: '"@/:'
         RequireEachIncludedType: true
       KmsKeyId:
