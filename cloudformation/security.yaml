@@ -54,11 +54,11 @@ Resources:
           FromPort: 3000
           ToPort: 3000
           IpProtocol: tcp
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
+      # SecurityGroupEgress:
+      #   - IpProtocol: tcp
+      #     FromPort: 443
+      #     ToPort: 443
+      #     CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value:
