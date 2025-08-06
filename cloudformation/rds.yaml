@@ -99,6 +99,7 @@ Resources:
       # MasterUserSecret:
       #   KmsKeyId:
       #     Ref: KMSKey
+      DBName: jira
       VPCSecurityGroups:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
