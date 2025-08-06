@@ -11,7 +11,6 @@
     "lint": "eslint . --ext .ts",
     "prisma_migrate_dev": "npx prisma migrate dev",
     "prisma_migrate": "npx prisma migrate deploy",
-    "prisma_generate": "npx prisma generate",
     "prepare": "husky",
     "clean": "rm -rf dist"
   },
