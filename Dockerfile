@@ -17,7 +17,8 @@ RUN npm run build
 
 RUN npm run prisma_migrate
 
-CMD [ "node" , "./dist/app.js"]
+# CMD [ "node" , "./dist/app.js"]
+CMD [ "npm" , "run", "migrate_and_run"]
 
 EXPOSE 3000
 
