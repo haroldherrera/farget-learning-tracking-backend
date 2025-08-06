@@ -65,20 +65,20 @@ Resources:
               - 'kms:GenerateDataKeyWithoutPlaintext'
             Resource: '*'
 
-  DBMasterUserSecret:
-    DependsOn: KMSKey
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: jira-db-master-secret
-      Description: Master DB credentials
-      GenerateSecretString:
-        SecretStringTemplate: '{"username": "postgres"}'
-        GenerateStringKey: password
-        PasswordLength: 14
-        ExcludeCharacters: '"@/:$+~.^\<]&{?)![_'
-        RequireEachIncludedType: true
-      KmsKeyId:
-        Ref: KMSKey
+  # DBMasterUserSecret:
+  #   DependsOn: KMSKey
+  #   Type: AWS::SecretsManager::Secret
+  #   Properties:
+  #     Name: jira-db-master-secret
+  #     Description: Master DB credentials
+  #     GenerateSecretString:
+  #       SecretStringTemplate: '{"username": "postgres"}'
+  #       GenerateStringKey: password
+  #       PasswordLength: 14
+  #       ExcludeCharacters: '"@/:$+~.^\<]&{?)![_'
+  #       RequireEachIncludedType: true
+  #     KmsKeyId:
+  #       Ref: KMSKey
 
   DBInstance:
     DependsOn: DBMasterUserSecret
@@ -89,9 +89,12 @@ Resources:
       BackupRetentionPeriod: 0
       DBInstanceClass: db.t3.micro
       Engine: postgres
+      # MasterUserSecret:
+      #   SecretArn:
+      #     Fn::Sub: '${DBMasterUserSecret}'
       MasterUserSecret:
-        SecretArn:
-          Fn::Sub: '${DBMasterUserSecret}'
+        KmsKeyId:
+          Ref: KMSKey
       VPCSecurityGroups:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
@@ -130,10 +133,10 @@ Outputs:
       Name:
         Fn::Sub: '${AWS::StackName}-DBInstanceId'
 
-  DBMasterUserSecretArn:
-    Description: 'ARN of SecretsManager secret for DB master user credentials'
-    Value:
-      Ref: DBMasterUserSecret
-    Export:
-      Name:
-        Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
+  # DBMasterUserSecretArn:
+  #   Description: 'ARN of SecretsManager secret for DB master user credentials'
+  #   Value:
+  #     Ref: DBMasterUserSecret
+  #   Export:
+  #     Name:
+  #       Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
