@@ -92,6 +92,8 @@ Resources:
       # MasterUserSecret:
       #   SecretArn:
       #     Fn::Sub: '${DBMasterUserSecret}'
+      MasterUsername: MyName
+      ManageMasterUserPassword: true
       MasterUserSecret:
         KmsKeyId:
           Ref: KMSKey
