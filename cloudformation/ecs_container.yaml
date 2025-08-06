@@ -93,9 +93,7 @@ Resources:
               Value:
                 Fn::Sub:
                   - >-
-                    postgresql://${DBUsername}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}?schema=public
-                  - DBUsername:
-                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                    postgresql://MyName:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}?schema=public
                   - DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
