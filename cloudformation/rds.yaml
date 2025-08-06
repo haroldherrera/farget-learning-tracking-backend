@@ -94,7 +94,7 @@ Resources:
       #     Fn::Sub: '${DBMasterUserSecret}'
       MasterUsername: MyName
       MasterUserPassword: MyPassword
-      PubliclyAccessible: true
+      # PubliclyAccessible: true
       # ManageMasterUserPassword: true
       # MasterUserSecret:
       #   KmsKeyId:
