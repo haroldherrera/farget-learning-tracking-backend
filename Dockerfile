@@ -15,7 +15,7 @@ RUN npx prisma generate
 
 RUN npm run build
 
-RUN npm run prisma_migrate
+RUN npx prisma migrate deploy
 
 CMD [ "node" , "./dist/app.js"]
 
