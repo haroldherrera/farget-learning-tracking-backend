@@ -142,3 +142,7 @@ Outputs:
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
+
+  Password:
+    Value:
+      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecret}:SecretString:password}}'
