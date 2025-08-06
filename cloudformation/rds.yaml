@@ -93,10 +93,11 @@ Resources:
       #   SecretArn:
       #     Fn::Sub: '${DBMasterUserSecret}'
       MasterUsername: MyName
-      ManageMasterUserPassword: true
-      MasterUserSecret:
-        KmsKeyId:
-          Ref: KMSKey
+      MasterUserPassword: MyPassword
+      # ManageMasterUserPassword: true
+      # MasterUserSecret:
+      #   KmsKeyId:
+      #     Ref: KMSKey
       VPCSecurityGroups:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
