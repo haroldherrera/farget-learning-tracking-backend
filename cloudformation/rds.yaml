@@ -145,4 +145,4 @@ Outputs:
 
   Password:
     Value:
-      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecret}:SecretString:password}}'
+      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecret.Arn}:SecretString:password}}'
