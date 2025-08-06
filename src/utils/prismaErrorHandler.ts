@@ -8,6 +8,7 @@ export interface PrismaError {
 }
 
 export function sendErrorResponse(error: unknown, res: Response) {
+  console.log('The Real Error', error);
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     const prismaError = handlePrismaError(error);
     return res.status(prismaError.status).json(prismaError);

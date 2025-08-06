@@ -42,6 +42,7 @@ Resources:
             Fn::Sub: Learning-Tracking-LoadBalancer-SG-{Environment}
 
   InstancesSecurityGroup:
+    DependsOn: RDSSecurityGroup
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: InstancesSecurityGroup
@@ -54,11 +55,16 @@ Resources:
           FromPort: 3000
           ToPort: 3000
           IpProtocol: tcp
-      # SecurityGroupEgress:
-      #   - IpProtocol: tcp
-      #     FromPort: 443
-      #     ToPort: 443
-      #     CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          DestinationSecurityGroupId:
+            -Ref: RDSSecurityGroup
       Tags:
         - Key: Name
           Value:
