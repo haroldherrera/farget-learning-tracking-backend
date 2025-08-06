@@ -81,7 +81,7 @@ Resources:
   #       Ref: KMSKey
 
   DBInstance:
-    DependsOn: DBMasterUserSecret
+    # DependsOn: DBMasterUserSecret
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
     Properties:
