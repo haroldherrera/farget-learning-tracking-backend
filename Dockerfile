@@ -12,13 +12,9 @@ COPY . /app
 
 RUN npx prisma generate
 
-
 RUN npm run build
 
-RUN npm run prisma_migrate
-
-# CMD [ "node" , "./dist/app.js"]
-CMD [ "npm" , "run", "migrate_and_run"]
+CMD [ "node" , "./dist/app.js"]
 
 EXPOSE 3000
 

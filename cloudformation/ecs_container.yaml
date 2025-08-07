@@ -79,8 +79,21 @@ Resources:
       ExecutionRoleArn:
         Ref: ECSTaskExecutionRole
       ContainerDefinitions:
+        - Name: migration
+          Image:
+            Ref: ECRImage
+          Essential: true
+          Command:
+            - npm
+            - run
+            - prisma_migrate
+
         - Name:
             Fn::Sub: learning-tracking-${Environment}
+          Essential: true
+          DependsOn:
+            - Condition: SUCCESS
+              ContainerName: migration
           Cpu: 512
           Memory: 1024
           Image:
