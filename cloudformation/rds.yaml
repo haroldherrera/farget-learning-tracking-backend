@@ -77,7 +77,6 @@ Resources:
         SecretStringTemplate: '{"username": "postgres"}'
         GenerateStringKey: password
         PasswordLength: 20
-        # ExcludeCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ "
         RequireEachIncludedType: false
       KmsKeyId:
         Ref: KMSKey
@@ -107,43 +106,44 @@ Resources:
         - Ref: RDSSecurityGroup
       DBSubnetGroupName:
         Ref: DBSubnetGroup
-# Outputs:
-#   DBInstanceEndpoint:
-#     Description: 'RDS Endpoint address to connect to the database'
-#     Value:
-#       Fn::GetAtt: DBInstance.Endpoint.Address
-#     Export:
-#       Name:
-#         Fn::Sub: '${AWS::StackName}-DBEndpoint'
 
-#   DBInstancePort:
-#     Description: 'Port number for RDS'
-#     Value:
-#       Fn::GetAtt: DBInstance.Endpoint.Port
-#     Export:
-#       Name:
-#         Fn::Sub: '${AWS::StackName}-DBPort'
+Outputs:
+  DBInstanceEndpoint:
+    Description: 'RDS Endpoint address to connect to the database'
+    Value:
+      Fn::GetAtt: DBInstance.Endpoint.Address
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBEndpoint'
 
-#   DBName:
-#     Description: 'Initial database name'
-#     Value:
-#       Ref: DBInstance
-#     Export:
-#       Name:
-#         Fn::Sub: '${AWS::StackName}-DBName'
+  DBInstancePort:
+    Description: 'Port number for RDS'
+    Value:
+      Fn::GetAtt: DBInstance.Endpoint.Port
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBPort'
 
-#   DBInstanceIdentifier:
-#     Description: 'DB instance identifier'
-#     Value:
-#       Ref: DBInstance
-#     Export:
-#       Name:
-#         Fn::Sub: '${AWS::StackName}-DBInstanceId'
+  DBName:
+    Description: 'Initial database name'
+    Value:
+      Ref: DBInstance
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBName'
 
-#   DBMasterUserSecretArn:
-#     Description: 'ARN of SecretsManager secret for DB master user credentials'
-#     Value:
-#       Ref: DBMasterUserSecret
-#     Export:
-#       Name:
-#         Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
+  DBInstanceIdentifier:
+    Description: 'DB instance identifier'
+    Value:
+      Ref: DBInstance
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBInstanceId'
+
+  DBMasterUserSecretArn:
+    Description: 'ARN of SecretsManager secret for DB master user credentials'
+    Value:
+      Ref: DBMasterUserSecret
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'

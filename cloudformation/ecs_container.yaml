@@ -90,7 +90,13 @@ Resources:
           Environment:
             - Name: DATABASE_URL
               Value:
-                Fn::Sub: postgresql://MyName:MyPassword@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                Fn::Sub:
+                  - >-
+                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  - DBUserName:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                  - DBPassword:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
         - Name:
             Fn::Sub: learning-tracking-${Environment}

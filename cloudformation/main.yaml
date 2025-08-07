@@ -158,43 +158,43 @@ Resources:
         RDSSecurityGroup:
           Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
 
-  # ECSContainerStack:
-  #   DependsOn:
-  #     - IAMStack
-  #     - LoadBalacingStack
-  #     - RDSStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ./ecs_container.yaml
-  #     Parameters:
-  #       Environment:
-  #         Ref: Environment
-  #       EC2InstanceProfile:
-  #         Fn::GetAtt: IAMStack.Outputs.EC2InstanceProfile
-  #       TargetGroupArn:
-  #         Fn::GetAtt: LoadBalacingStack.Outputs.TargetGroupArn
-  #       ECSAMI:
-  #         Ref: ECSAMI
-  #       PrivateSubnetA:
-  #         Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
-  #       PrivateSubnetB:
-  #         Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
-  #       InstancesSecurityGroup:
-  #         Fn::GetAtt: SecurityStack.Outputs.InstancesSecurityGroup
-  #       ECSTaskExecutionRole:
-  #         Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
-  #       ECRImage:
-  #         Ref: ECRImage
-  #       CorsOrigins:
-  #         Ref: CorsOrigins
-  #       DBInstanceEndpoint:
-  #         Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
-  #       DBInstancePort:
-  #         Fn::GetAtt: RDSStack.Outputs.DBInstancePort
-  #       DBName:
-  #         Ref: DBName
-  #       DBMasterUserSecretArn:
-  #         Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
+  ECSContainerStack:
+    DependsOn:
+      - IAMStack
+      - LoadBalacingStack
+      - RDSStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./ecs_container.yaml
+      Parameters:
+        Environment:
+          Ref: Environment
+        EC2InstanceProfile:
+          Fn::GetAtt: IAMStack.Outputs.EC2InstanceProfile
+        TargetGroupArn:
+          Fn::GetAtt: LoadBalacingStack.Outputs.TargetGroupArn
+        ECSAMI:
+          Ref: ECSAMI
+        PrivateSubnetA:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+        PrivateSubnetB:
+          Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        InstancesSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.InstancesSecurityGroup
+        ECSTaskExecutionRole:
+          Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
+        ECRImage:
+          Ref: ECRImage
+        CorsOrigins:
+          Ref: CorsOrigins
+        DBInstanceEndpoint:
+          Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
+        DBInstancePort:
+          Fn::GetAtt: RDSStack.Outputs.DBInstancePort
+        DBName:
+          Ref: DBName
+        DBMasterUserSecretArn:
+          Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack
