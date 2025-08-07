@@ -95,7 +95,7 @@ Resources:
                     postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
                   - DBUserName:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
-                  - DBPassword:
+                    DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
         - Name:
@@ -123,7 +123,7 @@ Resources:
                     postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
                   - DBUserName:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
-                  - DBPassword:
+                    DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
           PortMappings:
