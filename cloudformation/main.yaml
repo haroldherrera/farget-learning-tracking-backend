@@ -140,28 +140,29 @@ Resources:
         HealthCheckPath:
           Ref: HealthCheckPath
 
-  # RDSStack:
-  #   DependsOn:
-  #     - VPCStack
-  #     - SecurityStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ./rds.yaml
-  #     Parameters:
-  #       SubnetIds:
-  #         Fn::Join:
-  #           - ','
-  #           - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
-  #             - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
-  #       DBName:
-  #         Ref: DBName
-  #       RDSSecurityGroup:
-  #         Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
+  RDSStack:
+    DependsOn:
+      - VPCStack
+      - SecurityStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./rds.yaml
+      Parameters:
+        SubnetIds:
+          Fn::Join:
+            - ','
+            - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+              - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        DBName:
+          Ref: DBName
+        RDSSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
 
   # ECSContainerStack:
   #   DependsOn:
   #     - IAMStack
   #     - LoadBalacingStack
+  #     - RDSStack
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
   #     TemplateURL: ./ecs_container.yaml
@@ -192,8 +193,8 @@ Resources:
   #         Fn::GetAtt: RDSStack.Outputs.DBInstancePort
   #       DBName:
   #         Ref: DBName
-  #       # DBMasterUserSecretArn:
-  #       #   Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
+  #       DBMasterUserSecretArn:
+  #         Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack

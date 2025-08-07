@@ -81,7 +81,7 @@ Resources:
         Ref: KMSKey
 
   DBInstance:
-    # DependsOn: DBMasterUserSecret
+    DependsOn: DBMasterUserSecret
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
     Properties:
@@ -92,7 +92,7 @@ Resources:
       MasterUserSecret:
         SecretArn:
           Ref: DBMasterUserSecret
-      MasterUsername: MyName
+      # MasterUsername: MyName
       # MasterUserPassword: MyPassword
       # PubliclyAccessible: true
       # ManageMasterUserPassword: true
@@ -139,10 +139,10 @@ Outputs:
       Name:
         Fn::Sub: '${AWS::StackName}-DBInstanceId'
 
-  # DBMasterUserSecretArn```````````````````````````````````````````````````````lcx 6+66588/8`:
-  #   Description: 'ARN of SecretsManager secret for DB master user credentials'
-  #   Value:
-  #     Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
-  #   Export:
-  #     Name:
-  #       Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
+  DBMasterUserSecretArn:
+    Description: 'ARN of SecretsManager secret for DB master user credentials'
+    Value:
+      Ref: DBMasterUserSecret
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
