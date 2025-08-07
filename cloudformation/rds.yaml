@@ -76,7 +76,7 @@ Resources:
         IncludeSpace: false
         SecretStringTemplate: '{"username": "postgres"}'
         GenerateStringKey: password
-        PasswordLength: 20
+        PasswordLength: 10
         RequireEachIncludedType: false
       KmsKeyId:
         Ref: KMSKey

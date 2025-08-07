@@ -92,10 +92,10 @@ Resources:
               Value:
                 Fn::Sub:
                   - >-
-                    postgresql://postgres:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-                  # - DBUserName:
-                  #     Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
-                  - DBPassword:
+                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  - DBUserName:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                    DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
           LogConfiguration:
             LogDriver: awslogs
@@ -131,10 +131,10 @@ Resources:
               Value:
                 Fn::Sub:
                   - >-
-                    postgresql://postgres:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-                  # - DBUserName:
-                  #     Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
-                  - DBPassword:
+                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  - DBUserName:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                    DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
           PortMappings:
