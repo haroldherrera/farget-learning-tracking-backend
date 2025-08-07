@@ -72,12 +72,13 @@ Resources:
       Name: jira-db-master-secret
       Description: Master DB credentials
       GenerateSecretString:
-        # SecretStringTemplate: '{"username": "postgres"}'
-        # GenerateStringKey: password
-        # PasswordLength: 10
+        ExcludePunctuation: true
+        IncludeSpace: false
+        SecretStringTemplate: '{"username": "postgres"}'
+        GenerateStringKey: password
+        PasswordLength: 20
         # ExcludeCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ "
-        # RequireEachIncludedType: false
-        SecretString: '{"username": "postgres", "password": "MyPassword"}'
+        RequireEachIncludedType: false
       KmsKeyId:
         Ref: KMSKey
 
