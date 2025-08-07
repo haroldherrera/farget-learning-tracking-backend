@@ -82,31 +82,31 @@ Resources:
       KmsKeyId:
         Ref: KMSKey
 
-  # DBInstance:
-  #   DependsOn: DBMasterUserSecret
-  #   Type: AWS::RDS::DBInstance
-  #   DeletionPolicy: Delete
-  #   Properties:
-  #     AllocatedStorage: 5
-  #     BackupRetentionPeriod: 0
-  #     DBInstanceClass: db.t3.micro
-  #     Engine: postgres
-  #     ManageMasterUserPassword: true
-  #     MasterUserSecret:
-  #       SecretArn:
-  #         Ref: DBMasterUserSecret
-  #     # MasterUsername: MyName
-  #     # MasterUserPassword: MyPassword
-  #     # PubliclyAccessible: true
-  #     # MasterUserSecret:
-  #     #   KmsKeyId:
-  #     #     Ref: KMSKey
-  #     DBName:
-  #       Ref: DBName
-  #     VPCSecurityGroups:
-  #       - Ref: RDSSecurityGroup
-  #     DBSubnetGroupName:
-  #       Ref: DBSubnetGroup
+  DBInstance:
+    DependsOn: DBMasterUserSecret
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      AllocatedStorage: 5
+      BackupRetentionPeriod: 0
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      ManageMasterUserPassword: true
+      MasterUserSecret:
+        SecretArn:
+          Ref: DBMasterUserSecret
+      # MasterUsername: MyName
+      # MasterUserPassword: MyPassword
+      # PubliclyAccessible: true
+      # MasterUserSecret:
+      #   KmsKeyId:
+      #     Ref: KMSKey
+      DBName:
+        Ref: DBName
+      VPCSecurityGroups:
+        - Ref: RDSSecurityGroup
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
 # Outputs:
 #   DBInstanceEndpoint:
 #     Description: 'RDS Endpoint address to connect to the database'
