@@ -82,7 +82,7 @@ Resources:
         - Name: migration
           Image:
             Ref: ECRImage
-          Essential: true
+          Essential: false
           Command:
             - npm
             - run
