@@ -95,7 +95,7 @@ Resources:
       MasterUserSecret:
         SecretArn:
           Ref: DBMasterUserSecret
-      # MasterUsername: MyName
+      MasterUsername: postgres
       # MasterUserPassword: MyPassword
       # PubliclyAccessible: true
       # MasterUserSecret:
