@@ -24,61 +24,61 @@ Resources:
         - Key: Name
           Value: JiraSubnetGroup
 
-  # KMSKey:
-  #   Type: 'AWS::KMS::Key'
-  #   Properties:
-  #     Description: Manual test KMS key
-  #     EnableKeyRotation: True
-  #     KeyPolicy:
-  #       Version: '2012-10-17'
-  #       Id: allow-root-account
-  #       Statement:
-  #         - Sid: AllowRootAccountFullAccess
-  #           Effect: Allow
-  #           Principal:
-  #             AWS:
-  #               Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
-  #           Action: 'kms:*'
-  #           Resource: '*'
-  #         - Sid: Allow GitHub Actions to use KMS key
-  #           Effect: Allow
-  #           Principal:
-  #             AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
-  #           Action:
-  #             - 'kms:Create*'
-  #             - 'kms:Describe*'
-  #             - 'kms:Enable*'
-  #             - 'kms:List*'
-  #             - 'kms:Put*'
-  #             - 'kms:Update*'
-  #             - 'kms:Revoke*'
-  #             - 'kms:Disable*'
-  #             - 'kms:Get*'
-  #             - 'kms:Delete*'
-  #             - 'kms:ScheduleKeyDeletion'
-  #             - 'kms:CancelKeyDeletion'
-  #             - 'kms:DescribeKey'
-  #             - 'kms:Encrypt'
-  #             - 'kms:Decrypt'
-  #             - 'kms:ReEncrypt*'
-  #             - 'kms:GenerateDataKey'
-  #             - 'kms:GenerateDataKeyWithoutPlaintext'
-  #           Resource: '*'
+  KMSKey:
+    Type: 'AWS::KMS::Key'
+    Properties:
+      Description: Manual test KMS key
+      EnableKeyRotation: True
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: allow-root-account
+        Statement:
+          - Sid: AllowRootAccountFullAccess
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow GitHub Actions to use KMS key
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
+            Action:
+              - 'kms:Create*'
+              - 'kms:Describe*'
+              - 'kms:Enable*'
+              - 'kms:List*'
+              - 'kms:Put*'
+              - 'kms:Update*'
+              - 'kms:Revoke*'
+              - 'kms:Disable*'
+              - 'kms:Get*'
+              - 'kms:Delete*'
+              - 'kms:ScheduleKeyDeletion'
+              - 'kms:CancelKeyDeletion'
+              - 'kms:DescribeKey'
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:ReEncrypt*'
+              - 'kms:GenerateDataKey'
+              - 'kms:GenerateDataKeyWithoutPlaintext'
+            Resource: '*'
 
-  # DBMasterUserSecret:
-  #   DependsOn: KMSKey
-  #   Type: AWS::SecretsManager::Secret
-  #   Properties:
-  #     Name: jira-db-master-secret
-  #     Description: Master DB credentials
-  #     GenerateSecretString:
-  #       SecretStringTemplate: '{"username": "postgres"}'
-  #       GenerateStringKey: password
-  #       PasswordLength: 14
-  #       ExcludeCharacters: '"@/:$+~.^\<]&{?)![_'
-  #       RequireEachIncludedType: true
-  #     KmsKeyId:
-  #       Ref: KMSKey
+  DBMasterUserSecret:
+    DependsOn: KMSKey
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: jira-db-master-secret
+      Description: Master DB credentials
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "postgres"}'
+        GenerateStringKey: password
+        PasswordLength: 10
+        ExcludeCharacters: '@/:$+~.^\<]&{?)![_ '
+        RequireEachIncludedType: true
+      KmsKeyId:
+        Ref: KMSKey
 
   DBInstance:
     # DependsOn: DBMasterUserSecret
@@ -89,11 +89,11 @@ Resources:
       BackupRetentionPeriod: 0
       DBInstanceClass: db.t3.micro
       Engine: postgres
-      # MasterUserSecret:
-      #   SecretArn:
-      #     Fn::Sub: '${DBMasterUserSecret}'
+      MasterUserSecret:
+        SecretArn:
+          Ref: DBMasterUserSecret
       MasterUsername: MyName
-      MasterUserPassword: MyPassword
+      # MasterUserPassword: MyPassword
       # PubliclyAccessible: true
       # ManageMasterUserPassword: true
       # MasterUserSecret:
