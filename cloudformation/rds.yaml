@@ -94,8 +94,8 @@ Resources:
       MasterUserSecret:
         SecretArn:
           Ref: DBMasterUserSecret
-      # MasterUsername: MyName
-      # MasterUserPassword: MyPassword
+      MasterUsername: MyName
+      MasterUserPassword: MyPassword
       # PubliclyAccessible: true
       # ManageMasterUserPassword: true
       # MasterUserSecret:
