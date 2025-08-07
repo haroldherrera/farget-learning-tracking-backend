@@ -47,8 +47,8 @@ Parameters:
   DBName:
     Type: String
 
-  # DBMasterUserSecretArn:
-  #   Type: String
+  DBMasterUserSecretArn:
+    Type: String
 
 Conditions:
   IsDevelopment:
@@ -106,17 +106,19 @@ Resources:
             - Name: CORS_ORIGINS
               Value:
                 Ref: CorsOrigins
-            - Name: DATABASE_URL
-              Value:
-                Fn::Sub: postgresql://MyName:MyPassword@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-
             # - Name: DATABASE_URL
             #   Value:
-            #     Fn::Sub:
-            #       - >-
-            #         postgresql://MyName:MyPassword@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-            # - DBPassword:
-            #     Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+            #     Fn::Sub: postgresql://MyName:MyPassword@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+
+            - Name: DATABASE_URL
+              Value:
+                Fn::Sub:
+                  - >-
+                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  - DBUserName:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                  - DBPassword:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
           PortMappings:
             - ContainerPort: 3000
