@@ -92,10 +92,10 @@ Resources:
               Value:
                 Fn::Sub:
                   - >-
-                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-                  - DBUserName:
-                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
-                    DBPassword:
+                    postgresql://postgres:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  # - DBUserName:
+                  #     Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                  - DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
         - Name:
@@ -120,10 +120,10 @@ Resources:
               Value:
                 Fn::Sub:
                   - >-
-                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-                  - DBUserName:
-                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
-                    DBPassword:
+                    postgresql://postgres:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  # - DBUserName:
+                  #     Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                  - DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
 
           PortMappings:
