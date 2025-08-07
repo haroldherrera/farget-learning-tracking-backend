@@ -162,6 +162,7 @@ Resources:
   #   DependsOn:
   #     - IAMStack
   #     - LoadBalacingStack
+  #     - RDSStack
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
   #     TemplateURL: ./ecs_container.yaml
