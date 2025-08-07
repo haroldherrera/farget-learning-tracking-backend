@@ -72,39 +72,40 @@ Resources:
       Name: jira-db-master-secret
       Description: Master DB credentials
       GenerateSecretString:
-        SecretStringTemplate: '{"username": "postgres"}'
-        GenerateStringKey: password
-        PasswordLength: 10
-        ExcludeCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ "
-        RequireEachIncludedType: false
+        # SecretStringTemplate: '{"username": "postgres"}'
+        # GenerateStringKey: password
+        # PasswordLength: 10
+        # ExcludeCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ "
+        # RequireEachIncludedType: false
+        SecretString: '{"username": "postgres", "password": "MyPassword"}'
       KmsKeyId:
         Ref: KMSKey
 
-  # DBInstance:
-  #   DependsOn: DBMasterUserSecret
-  #   Type: AWS::RDS::DBInstance
-  #   DeletionPolicy: Delete
-  #   Properties:
-  #     AllocatedStorage: 5
-  #     BackupRetentionPeriod: 0
-  #     DBInstanceClass: db.t3.micro
-  #     Engine: postgres
-  #     MasterUserSecret:
-  #       SecretArn:
-  #         Ref: DBMasterUserSecret
-  #     # MasterUsername: MyName
-  #     # MasterUserPassword: MyPassword
-  #     # PubliclyAccessible: true
-  #     # ManageMasterUserPassword: true
-  #     # MasterUserSecret:
-  #     #   KmsKeyId:
-  #     #     Ref: KMSKey
-  #     DBName:
-  #       Ref: DBName
-  #     VPCSecurityGroups:
-  #       - Ref: RDSSecurityGroup
-  #     DBSubnetGroupName:
-  #       Ref: DBSubnetGroup
+  DBInstance:
+    DependsOn: DBMasterUserSecret
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      AllocatedStorage: 5
+      BackupRetentionPeriod: 0
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      MasterUserSecret:
+        SecretArn:
+          Ref: DBMasterUserSecret
+      # MasterUsername: MyName
+      # MasterUserPassword: MyPassword
+      # PubliclyAccessible: true
+      # ManageMasterUserPassword: true
+      # MasterUserSecret:
+      #   KmsKeyId:
+      #     Ref: KMSKey
+      DBName:
+        Ref: DBName
+      VPCSecurityGroups:
+        - Ref: RDSSecurityGroup
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
 # Outputs:
 #   DBInstanceEndpoint:
 #     Description: 'RDS Endpoint address to connect to the database'
