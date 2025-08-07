@@ -97,6 +97,17 @@ Resources:
                   #     Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
                   - DBPassword:
                       Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              mode: non-blocking
+              max-buffer-size: 25m
+              awslogs-group:
+                Fn::Sub: /ecs/Nodejs-app-${Environment}
+              awslogs-region:
+                Ref: AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
 
         - Name:
             Fn::Sub: learning-tracking-${Environment}
