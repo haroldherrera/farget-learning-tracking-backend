@@ -87,6 +87,10 @@ Resources:
             - npm
             - run
             - prisma_migrate
+          Environment:
+            - Name: DATABASE_URL
+              Value:
+                Fn::Sub: postgresql://MyName:MyPassword@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
 
         - Name:
             Fn::Sub: learning-tracking-${Environment}
