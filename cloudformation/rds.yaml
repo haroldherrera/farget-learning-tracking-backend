@@ -147,11 +147,3 @@ Outputs:
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
-
-  # DBMasterUserSecretArn:
-  #   Description: 'ARN of SecretsManager secret for DB master user credentials'
-  #   Value:
-  #     Ref: DBMasterUserSecret
-  #   Export:
-  #     Name:
-  #       Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
