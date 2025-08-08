@@ -82,7 +82,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name:
-        Fn::Sub: jira-db-master-secret-${Environment}
+        Fn::Sub: jira-db-master-secret
       Description: Master DB credentials
       GenerateSecretString:
         ExcludePunctuation: true
