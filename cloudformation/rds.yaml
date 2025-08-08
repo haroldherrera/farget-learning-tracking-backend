@@ -81,8 +81,7 @@ Resources:
     DependsOn: KMSKey
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name:
-        Fn::Sub: jira-db-master-secret
+      Name: jira-db-master-secret
       Description: Master DB credentials
       GenerateSecretString:
         ExcludePunctuation: true
