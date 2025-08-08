@@ -29,7 +29,7 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Jira Subnets
       DBSubnetGroupName:
-        Fn::Sub: 'jira-subnetGroup-${Environment}'
+        Fn::Sub: jira-subnetGroup-${Environment}
       SubnetIds:
         Ref: SubnetIds
       Tags:
@@ -81,7 +81,8 @@ Resources:
     DependsOn: KMSKey
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: jira-db-master-secret-${Environment}
+      Name:
+        Fn::Sub: jira-db-master-secret-${Environment}
       Description: Master DB credentials
       GenerateSecretString:
         ExcludePunctuation: true
