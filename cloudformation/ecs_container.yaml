@@ -83,10 +83,16 @@ Resources:
           Image:
             Ref: ECRImage
           Essential: false
+          # Command:
+          #   - npm
+          #   - run
+          #   - prisma_migrate
           Command:
-            - npm
-            - run
-            - prisma_migrate
+            - /bin/sh
+            - -c
+            - |
+              echo "DATABASE_URL=$DATABASE_URL"
+              npm run prisma_migrate
           Environment:
             - Name: DATABASE_URL
               Value:
