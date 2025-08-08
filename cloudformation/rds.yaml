@@ -85,10 +85,11 @@ Resources:
         Fn::Sub: 'jira-db-master-secret-${Environment}'
       Description: Master DB credentials
       GenerateSecretString:
-        ExcludePunctuation: true
+        # ExcludePunctuation: true
+        ExcludeCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
         IncludeSpace: false
-        # SecretStringTemplate:
-        #   Fn::Sub: '{"username": "${MasterUsername}"}'
+        SecretStringTemplate:
+          Fn::Sub: '{"username": "${MasterUsername}"}'
         GenerateStringKey: password
         PasswordLength: 10
         RequireEachIncludedType: false
