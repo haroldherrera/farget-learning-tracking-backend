@@ -1,25 +1,19 @@
 import { z } from 'zod';
 
-export const taskSchema = z.object({
-  id: z.number(),
-  title: z.string().min(1),
-  description: z.string(),
-  status: z.enum(['To Do', 'In Progress', 'Done']),
-  priority: z.enum(['Low', 'Medium', 'High', 'Critical']),
-  assignee: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      email: z.string().email(),
-    })
-    .nullable(),
-  reporter: z.object({
-    id: z.number(),
-    name: z.string(),
-    email: z.email(),
-  }),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+export const TaskStatusEnum = z.enum(['TODO', 'IN_PROGRESS', 'DONE']);
+export const TaskPriorityEnum = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
+
+export const CreateTaskInputSchema = z.object({
+  title: z.string().max(255),
+  description: z.string().max(1000),
+  status: TaskStatusEnum,
+  priority: TaskPriorityEnum,
+  assigneeId: z.cuid().optional().nullable(),
+  reporterId: z.cuid(),
 });
 
-export type Task = z.infer<typeof taskSchema>;
+export type CreateTaskInput = z.infer<typeof CreateTaskInputSchema>;
+
+export const EditTaskInputSchema = CreateTaskInputSchema.partial();
+
+export type EditTaskInput = z.infer<typeof EditTaskInputSchema>;

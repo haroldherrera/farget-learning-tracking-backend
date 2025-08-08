@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native"]
+
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================================================================
+// *********************************************** TASKS ***********************************************
+// =====================================================================================================
+model Task {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  description String   @db.VarChar(1000)
+  status      Status
+  priority    Priority
+  assigneeId  String?     
+  assignee    User?     @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  reporterId  String    
+  reporter    User      @relation("ReportedTasks", fields: [reporterId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum Status {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// =====================================================================================================
+// *********************************************** TASKS ***********************************************
+// =====================================================================================================
+model User {
+  id             String   @id @default(cuid())
+  name           String   @unique @db.VarChar(100)
+  email          String   @unique @db.VarChar(255)
+  assignedTasks  Task[]   @relation("AssignedTasks")
+  reportedTasks  Task[]   @relation("ReportedTasks")
+}

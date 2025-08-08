@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates the Database of the System
+
+Parameters:
+  SubnetIds:
+    Description: The array of the subnets where the RDS will be displayed
+    Type: List<String>
+
+  DBName:
+    Type: String
+
+  MasterUsername:
+    Type: String
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+
+Resources:
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Jira Subnets
+      DBSubnetGroupName: jira-subnetGroup
+      SubnetIds:
+        Ref: SubnetIds
+      Tags:
+        - Key: Name
+          Value: JiraSubnetGroup
+
+  KMSKey:
+    Type: 'AWS::KMS::Key'
+    Properties:
+      Description: Manual test KMS key
+      EnableKeyRotation: True
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: allow-root-account
+        Statement:
+          - Sid: AllowRootAccountFullAccess
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow GitHub Actions to use KMS key
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::926989967422:role/GithubActionsHarold
+            Action:
+              - 'kms:Create*'
+              - 'kms:Describe*'
+              - 'kms:Enable*'
+              - 'kms:List*'
+              - 'kms:Put*'
+              - 'kms:Update*'
+              - 'kms:Revoke*'
+              - 'kms:Disable*'
+              - 'kms:Get*'
+              - 'kms:Delete*'
+              - 'kms:ScheduleKeyDeletion'
+              - 'kms:CancelKeyDeletion'
+              - 'kms:DescribeKey'
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:ReEncrypt*'
+              - 'kms:GenerateDataKey'
+              - 'kms:GenerateDataKeyWithoutPlaintext'
+            Resource: '*'
+
+  DBMasterUserSecret:
+    DependsOn: KMSKey
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: jira-db-master-secret
+      Description: Master DB credentials
+      GenerateSecretString:
+        ExcludePunctuation: true
+        IncludeSpace: false
+        SecretStringTemplate:
+          Fn::Sub: '{"username": "${MasterUsername}"}'
+        GenerateStringKey: password
+        PasswordLength: 10
+        RequireEachIncludedType: false
+      KmsKeyId:
+        Ref: KMSKey
+
+  DBInstance:
+    DependsOn: DBMasterUserSecret
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      AllocatedStorage: 5
+      BackupRetentionPeriod: 0
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      ManageMasterUserPassword: true
+      MasterUserSecret:
+        SecretArn:
+          Ref: DBMasterUserSecret
+      MasterUsername:
+        Ref: MasterUsername
+      DBName:
+        Ref: DBName
+      VPCSecurityGroups:
+        - Ref: RDSSecurityGroup
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+
+Outputs:
+  DBInstanceEndpoint:
+    Description: 'RDS Endpoint address to connect to the database'
+    Value:
+      Fn::GetAtt: DBInstance.Endpoint.Address
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBEndpoint'
+
+  DBInstancePort:
+    Description: 'Port number for RDS'
+    Value:
+      Fn::GetAtt: DBInstance.Endpoint.Port
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBPort'
+
+  DBName:
+    Description: 'Initial database name'
+    Value:
+      Ref: DBInstance
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBName'
+
+  DBInstanceIdentifier:
+    Description: 'DB instance identifier'
+    Value:
+      Ref: DBInstance
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBInstanceId'
+
+  DBMasterUserSecretArn:
+    Description: 'ARN of SecretsManager secret for DB master user credentials'
+    Value:
+      Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
+    Export:
+      Name:
+        Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'

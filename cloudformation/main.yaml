@@ -33,11 +33,22 @@ Parameters:
   HealthCheckPath:
     Type: String
 
+  CorsOrigins:
+    Type: String
+    Default: http://localhost:51730,https://www.development.mastersweb.click,https://development.mastersweb.click,https://www.stage.mastersweb.click,https://stage.mastersweb.click
+
+  DBName:
+    Type: String
+
+  MasterUsername:
+    Type: String
+
 Conditions:
   IsStaging:
     Fn::Equals:
       - Ref: Environment
       - stage
+
 Resources:
   CertificateStack:
     Type: AWS::CloudFormation::Stack
@@ -129,10 +140,31 @@ Resources:
         HealthCheckPath:
           Ref: HealthCheckPath
 
+  RDSStack:
+    DependsOn:
+      - VPCStack
+      - SecurityStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./rds.yaml
+      Parameters:
+        SubnetIds:
+          Fn::Join:
+            - ','
+            - - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetA
+              - Fn::GetAtt: VPCStack.Outputs.PrivateSubnetB
+        DBName:
+          Ref: DBName
+        RDSSecurityGroup:
+          Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
+        MasterUsername:
+          Ref: MasterUsername
+
   ECSContainerStack:
     DependsOn:
       - IAMStack
       - LoadBalacingStack
+      - RDSStack
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./ecs_container.yaml
@@ -155,6 +187,16 @@ Resources:
           Fn::GetAtt: IAMStack.Outputs.ECSTaskExecutionRole
         ECRImage:
           Ref: ECRImage
+        CorsOrigins:
+          Ref: CorsOrigins
+        DBInstanceEndpoint:
+          Fn::GetAtt: RDSStack.Outputs.DBInstanceEndpoint
+        DBInstancePort:
+          Fn::GetAtt: RDSStack.Outputs.DBInstancePort
+        DBName:
+          Ref: DBName
+        DBMasterUserSecretArn:
+          Fn::GetAtt: RDSStack.Outputs.DBMasterUserSecretArn
 
   Route53Stack:
     DependsOn: LoadBalacingStack

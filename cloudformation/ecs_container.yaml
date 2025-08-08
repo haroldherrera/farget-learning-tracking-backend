@@ -35,6 +35,21 @@ Parameters:
     Description: The ECR image of the docker container to be deployed
     Type: String
 
+  CorsOrigins:
+    Type: String
+
+  DBInstanceEndpoint:
+    Type: String
+
+  DBInstancePort:
+    Type: String
+
+  DBName:
+    Type: String
+
+  DBMasterUserSecretArn:
+    Type: String
+
 Conditions:
   IsDevelopment:
     Fn::Equals:
@@ -64,12 +79,60 @@ Resources:
       ExecutionRoleArn:
         Ref: ECSTaskExecutionRole
       ContainerDefinitions:
+        - Name: migration
+          Image:
+            Ref: ECRImage
+          Essential: false
+          Command:
+            - npm
+            - run
+            - prisma_migrate
+          Environment:
+            - Name: DATABASE_URL
+              Value:
+                Fn::Sub:
+                  - >-
+                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  - DBUserName:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                    DBPassword:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              mode: non-blocking
+              max-buffer-size: 25m
+              awslogs-group:
+                Fn::Sub: /ecs/Nodejs-app-${Environment}
+              awslogs-region:
+                Ref: AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+
         - Name:
             Fn::Sub: learning-tracking-${Environment}
+          Essential: true
+          DependsOn:
+            - Condition: SUCCESS
+              ContainerName: migration
           Cpu: 512
           Memory: 1024
           Image:
             Ref: ECRImage
+          Environment:
+            - Name: CORS_ORIGINS
+              Value:
+                Ref: CorsOrigins
+            - Name: DATABASE_URL
+              Value:
+                Fn::Sub:
+                  - >-
+                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+                  - DBUserName:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+                    DBPassword:
+                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+
           PortMappings:
             - ContainerPort: 3000
               HostPort: 3000
