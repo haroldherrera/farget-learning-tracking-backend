@@ -15,12 +15,21 @@ Parameters:
   RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup::Id
 
+  Environment:
+    Description: development | stage |production
+    Type: String
+    AllowedValues:
+      - development
+      - stage
+      - production
+
 Resources:
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Jira Subnets
-      DBSubnetGroupName: jira-subnetGroup
+      DBSubnetGroupName:
+        Fn::Sub: jira-subnetGroup-${Environment}
       SubnetIds:
         Ref: SubnetIds
       Tags:
@@ -72,7 +81,7 @@ Resources:
     DependsOn: KMSKey
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: jira-db-master-secret
+      Name: jira-db-master-secret-${Environment}
       Description: Master DB credentials
       GenerateSecretString:
         ExcludePunctuation: true
