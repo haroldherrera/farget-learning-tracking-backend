@@ -29,7 +29,7 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Jira Subnets
       DBSubnetGroupName:
-        Fn::Sub: jira-subnetGroup-${Environment}
+        Fn::Sub: 'jira-subnetGroup-${Environment}'
       SubnetIds:
         Ref: SubnetIds
       Tags:
