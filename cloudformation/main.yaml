@@ -157,6 +157,8 @@ Resources:
           Ref: DBName
         RDSSecurityGroup:
           Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
+        MasterUsername:
+          Ref: MasterUsername
 
   ECSContainerStack:
     DependsOn:
