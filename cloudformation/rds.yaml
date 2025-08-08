@@ -136,22 +136,6 @@ Outputs:
       Name:
         Fn::Sub: '${AWS::StackName}-DBPort'
 
-  DBName:
-    Description: 'Initial database name'
-    Value:
-      Ref: DBInstance
-    Export:
-      Name:
-        Fn::Sub: '${AWS::StackName}-DBName'
-
-  DBInstanceIdentifier:
-    Description: 'DB instance identifier'
-    Value:
-      Ref: DBInstance
-    Export:
-      Name:
-        Fn::Sub: '${AWS::StackName}-DBInstanceId'
-
   DBMasterUserSecretArn:
     Description: 'ARN of SecretsManager secret for DB master user credentials'
     Value:
