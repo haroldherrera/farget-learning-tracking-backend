@@ -123,10 +123,6 @@ Resources:
             - Name: CORS_ORIGINS
               Value:
                 Ref: CorsOrigins
-            # - Name: DATABASE_URL
-            #   Value:
-            #     Fn::Sub: postgresql://MyName:MyPassword@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-
             - Name: DATABASE_URL
               Value:
                 Fn::Sub:
