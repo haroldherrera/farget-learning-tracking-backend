@@ -159,6 +159,8 @@ Resources:
           Fn::GetAtt: SecurityStack.Outputs.RDSSecurityGroup
         MasterUsername:
           Ref: MasterUsername
+        Environment:
+          Ref: Environment
 
   ECSContainerStack:
     DependsOn:
