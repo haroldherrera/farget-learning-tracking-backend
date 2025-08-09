@@ -77,24 +77,24 @@ Resources:
   #             - 'kms:GenerateDataKeyWithoutPlaintext'
   #           Resource: '*'
 
-  DBMasterUserSecret:
-    # DependsOn: KMSKey
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name:
-        Fn::Sub: 'jira-db-master-secret-${Environment}'
-      Description: Master DB credentials
-      GenerateSecretString:
-        ExcludePunctuation: true
-        # ExcludeCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-        IncludeSpace: false
-        SecretStringTemplate:
-          Fn::Sub: '{"username": "${MasterUsername}"}'
-        GenerateStringKey: password
-        PasswordLength: 30
-        RequireEachIncludedType: false
-      # KmsKeyId:
-      #   Ref: KMSKey
+  # DBMasterUserSecret:
+  #   # DependsOn: KMSKey
+  #   Type: AWS::SecretsManager::Secret
+  #   Properties:
+  #     Name:
+  #       Fn::Sub: 'jira-db-master-secret-${Environment}'
+  #     Description: Master DB credentials
+  #     GenerateSecretString:
+  #       ExcludePunctuation: true
+  #       # ExcludeCharacters: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+  #       IncludeSpace: false
+  #       SecretStringTemplate:
+  #         Fn::Sub: '{"username": "${MasterUsername}"}'
+  #       GenerateStringKey: password
+  #       PasswordLength: 30
+  #       RequireEachIncludedType: false
+  #     # KmsKeyId:
+  #     #   Ref: KMSKey
 
   DBInstance:
     DependsOn: DBMasterUserSecret
@@ -108,9 +108,9 @@ Resources:
       DBInstanceClass: db.t3.micro
       Engine: postgres
       ManageMasterUserPassword: true
-      MasterUserSecret:
-        SecretArn:
-          Ref: DBMasterUserSecret
+      # MasterUserSecret:
+      #   SecretArn:
+      #     Ref: DBMasterUserSecret
       MasterUsername:
         Ref: MasterUsername
       DBName:
@@ -137,18 +137,18 @@ Outputs:
       Name:
         Fn::Sub: '${AWS::StackName}-DBPort'
 
-  # DBMasterUserSecretArn:
-  #   Description: 'ARN of SecretsManager secret for DB master user credentials'
-  #   Value:
-  #     Ref: DBMasterUserSecret
-  #   Export:
-  #     Name:
-  #       Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
-
   DBMasterUserSecretArn:
     Description: 'ARN of SecretsManager secret for DB master user credentials'
     Value:
-      Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
+      Ref: DBMasterUserSecret
     Export:
       Name:
         Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
+
+  # DBMasterUserSecretArn:
+  #   Description: 'ARN of SecretsManager secret for DB master user credentials'
+  #   Value:
+  #     Fn::GetAtt: DBInstance.MasterUserSecret.SecretArn
+  #   Export:
+  #     Name:
+  #       Fn::Sub: '${AWS::StackName}-DBMasterUserSecretArn'
