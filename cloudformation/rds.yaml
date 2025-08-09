@@ -91,7 +91,7 @@ Resources:
         SecretStringTemplate:
           Fn::Sub: '{"username": "${MasterUsername}"}'
         GenerateStringKey: password
-        PasswordLength: 10
+        PasswordLength: 30
         RequireEachIncludedType: false
       # KmsKeyId:
       #   Ref: KMSKey
