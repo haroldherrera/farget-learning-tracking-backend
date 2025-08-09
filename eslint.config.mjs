@@ -14,5 +14,5 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   tseslint.configs.recommended,
-  globalIgnores(['dist/**/*', 'generated/prisma/', '**/SetDBURL.js']),
+  globalIgnores(['dist/**/*', 'generated/prisma/', '**/setDBURL.js']),
 ]);
