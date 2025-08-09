@@ -91,18 +91,39 @@ Resources:
             - /bin/sh
             - -c
             - |
+              node setDBURL.js
               echo "DATABASE_URL=$DATABASE_URL"
-              npm run prisma_migrate
+              # npm run prisma_migrate
           Environment:
-            - Name: DATABASE_URL
+            # - Name: DATABASE_URL
+            #   Value:
+            #     Fn::Sub:
+            #       - >-
+            #         postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
+            #       - DBUserName:
+            #           Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+            #         DBPassword:
+            #           Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+            - Name: DB_USERNAME
               Value:
-                Fn::Sub:
-                  - >-
-                    postgresql://${DBUserName}:${DBPassword}@${DBInstanceEndpoint}:${DBInstancePort}/${DBName}
-                  - DBUserName:
-                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
-                    DBPassword:
-                      Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+                Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:username}}'
+
+            - Name: DB_PASSWORD
+              Value:
+                Fn::Sub: '{{resolve:secretsmanager:${DBMasterUserSecretArn}:SecretString:password}}'
+
+            - Name: DB_HOST
+              Value:
+                Ref: DBInstanceEndpoint
+
+            - Name: DB_PORT
+              Value:
+                Ref: DBInstancePort
+
+            - Name: DB_NAME
+              Value:
+                Ref: DBName
+
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -227,3 +248,6 @@ Resources:
         ScaleOutCooldown: 180
         PredefinedMetricSpecification:
           PredefinedMetricType: ECSServiceAverageCPUUtilization
+# *FY7C2lxgS7~cUrdQ-BC9Lq*wwHI
+# fZw92?pB)O9>5G3#7Hyu)LSLLu.r
+
