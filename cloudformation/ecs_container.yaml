@@ -91,6 +91,7 @@ Resources:
             - /bin/sh
             - -c
             - |
+              cd /app
               node setDBURL.js
               echo "DATABASE_URL=$DATABASE_URL"
               # npm run prisma_migrate
